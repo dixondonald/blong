@@ -498,6 +498,7 @@
 				824B84F11C97272A0009C182 /* Release */,
 			);
 			defaultConfigurationIsVisible = 0;
+			defaultConfigurationName = Release;
 		};
 		824B84F21C97272A0009C182 /* Build configuration list for PBXNativeTarget "BlongTests" */ = {
 			isa = XCConfigurationList;
@@ -506,6 +507,7 @@
 				824B84F41C97272A0009C182 /* Release */,
 			);
 			defaultConfigurationIsVisible = 0;
+			defaultConfigurationName = Release;
 		};
 		824B84F51C97272A0009C182 /* Build configuration list for PBXNativeTarget "BlongUITests" */ = {
 			isa = XCConfigurationList;
@@ -514,6 +516,7 @@
 				824B84F71C97272A0009C182 /* Release */,
 			);
 			defaultConfigurationIsVisible = 0;
+			defaultConfigurationName = Release;
 		};
 /* End XCConfigurationList section */
 	};
