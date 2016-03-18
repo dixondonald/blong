@@ -18,8 +18,8 @@
 @property (nonatomic, strong) UICollisionBehavior *collisionBehavior;
 @property (nonatomic, strong) UIPushBehavior *pushBehavior;
 @property (nonatomic, strong) UIDynamicItemBehavior *paddleBehavior;
+@property (nonatomic, strong) UIDynamicItemBehavior *AIPaddleBehavior;
 @property (nonatomic, strong) UIDynamicItemBehavior *ballBehavior;
-@property (nonatomic, strong) UIView *rightBorder;
 @end
 
 @implementation ViewController
@@ -28,31 +28,25 @@
     [super viewDidLoad];
     self.animator = [[UIDynamicAnimator new] initWithReferenceView:self.view];
     
-    CGRect rightBorderRect = CGRectMake(self.view.frame.size.width -2, 1, 2, self.view.frame.size.height);
-    self.rightBorder = [[UIView alloc] initWithFrame:rightBorderRect];
-    self.rightBorder.backgroundColor = [UIColor blackColor];
-    [self.view addSubview:self.rightBorder];
-    
+   
     CGRect ballRect = CGRectMake(self.view.bounds.size.width / 2, self.view.bounds.size.height / 2, 16, 16);
     self.ballView = [[UIView alloc] initWithFrame:ballRect];
     self.ballView.backgroundColor = [UIColor blackColor];
     self.ballView.layer.cornerRadius = 8;
     [self.view addSubview:self.ballView];
     
-    if (CGRectIntersectsRect(self.ballView.frame, self.rightBorder.frame)) {
-        NSLog(@"ball is gone");
-    }
-    
+
 //    self.gravityBehavior = [[UIGravityBehavior alloc] initWithItems:@[self.ballView]];
 //    self.gravityBehavior.magnitude = 0.5;
 //    [self.animator addBehavior:self.gravityBehavior];
    
+    
     CGRect paddleRect = CGRectMake(20, self.view.bounds.size.height / 2, 10, 50);
     self.paddleView = [[UIView alloc] initWithFrame:paddleRect];
     self.paddleView.backgroundColor = [UIColor blackColor];
     self.paddleView.layer.cornerRadius = 5;
-
     [self.view addSubview:self.paddleView];
+    
     
     CGRect AIPaddleRect = CGRectMake(self.view.bounds.size.width - 30, self.view.bounds.size.height / 2, 10, 50);
     self.AIPaddleView = [[UIView alloc] initWithFrame:AIPaddleRect];
@@ -67,6 +61,7 @@
     [self.collisionBehavior addBoundaryWithIdentifier:@"bottom" fromPoint:CGPointMake(1, self.view.frame.size.height - 1) toPoint:CGPointMake(self.view.frame.size.width - 1, self.view.frame.size.height - 1)];
      [self.animator addBehavior:self.collisionBehavior];
 
+    
     self.ballBehavior = [[UIDynamicItemBehavior alloc] initWithItems:@[self.ballView]];
     self.ballBehavior.resistance = 0;
     self.ballBehavior.elasticity = 1;
@@ -75,26 +70,38 @@
     [self.animator addBehavior:self.ballBehavior];
     
 
-    self.paddleBehavior = [[UIDynamicItemBehavior alloc] initWithItems:@[self.paddleView, self.AIPaddleView]];
+    self.paddleBehavior = [[UIDynamicItemBehavior alloc] initWithItems:@[self.paddleView]];
     self.paddleBehavior.density = 1000;
     self.paddleBehavior.allowsRotation = NO;
     [self.animator addBehavior:self.paddleBehavior];
     
+    self.AIPaddleBehavior = [[UIDynamicItemBehavior alloc] initWithItems:@[self.AIPaddleView]];
+    self.AIPaddleBehavior.density = 1000;
+    self.AIPaddleBehavior.allowsRotation = NO;
+    [self.animator addBehavior:self.AIPaddleBehavior];
+    
+   
     self.pushBehavior = [[UIPushBehavior alloc] initWithItems:@[self.ballView] mode:UIPushBehaviorModeInstantaneous];
     self.pushBehavior.angle = 4.05;
     self.pushBehavior.magnitude = 0.08;
     self.pushBehavior.active = YES;
     [self.animator addBehavior:self.pushBehavior];
     
+    
     self.paddleGesture = [[UIPanGestureRecognizer alloc] initWithTarget:self action:@selector(panFired:)];
 //    [self.view addGestureRecognizer:self.paddleGesture];
     [self.paddleView addGestureRecognizer:self.paddleGesture];
+    
+    
 }
 
+
 - (void) panFired:(UIPanGestureRecognizer *)recognizer {
-    CGPoint newPaddleCenter = [recognizer locationInView:self.view];
-    self.paddleView.center = CGPointMake(self.paddleView.center.x, newPaddleCenter.y);
-    [self.animator updateItemUsingCurrentState:self.paddleView];
+  //  if (recognizer.state == UIGestureRecognizerStateChanged) {
+        CGPoint newPaddleCenter = [recognizer locationInView:self.view];
+        self.paddleView.center = CGPointMake(self.paddleView.center.x, newPaddleCenter.y);
+        [self.animator updateItemUsingCurrentState:self.paddleView];
+  //  }
 }
 
 
