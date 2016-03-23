@@ -79,7 +79,11 @@
 //    [self.view addGestureRecognizer:self.paddleGesture];
     [self.paddleView addGestureRecognizer:self.paddleGesture];
     
-    
+    [NSTimer scheduledTimerWithTimeInterval:0.25f
+                                     target:self
+                                   selector:@selector(updateTime:)
+                                   userInfo:nil
+                                    repeats:YES];
 }
 
 
@@ -147,6 +151,25 @@
 
 }
 
+-(void)updateTime: (NSTimer *) timer {
+    CGPoint ballCenter = CGPointMake(self.ballView.center.x, self.ballView.center.y);
+    NSLog(@"%@", NSStringFromCGPoint(ballCenter));
+    if (ballCenter.x > self.view.frame.size.width / 2) {
+        
+    
+    [UIView animateWithDuration:0.35
+                          delay:0.0
+                        options: UIViewAnimationOptionTransitionNone
+                     animations:^{
+                            self.AIPaddleView.center = CGPointMake(self.AIPaddleView.center.x, ballCenter.y);                     }
+                     completion:^(BOOL finished){
+                         NSLog(@"Done!");
+                     }];
+    }
+    
+    [self.animator updateItemUsingCurrentState:self.AIPaddleView];
+
+}
 
 - (void)didReceiveMemoryWarning {
     [super didReceiveMemoryWarning];
