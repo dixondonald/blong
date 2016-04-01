@@ -17,15 +17,19 @@
 @property (nonatomic, strong) UIPanGestureRecognizer *leftPaddleGesture;
 @property (nonatomic, strong) UIPanGestureRecognizer *rightPaddleGesture;
 
-@property (nonatomic, strong) UIGravityBehavior *gravityBehavior;
 @property (nonatomic, strong) UICollisionBehavior *collisionBehavior;
 @property (nonatomic, strong) UIPushBehavior *pushBehavior;
 @property (nonatomic, strong) UIDynamicItemBehavior *leftPaddleBehavior;
 @property (nonatomic, strong) UIDynamicItemBehavior *rightPaddleBehavior;
 @property (nonatomic, strong) UIDynamicItemBehavior *ballBehavior;
 
+
 @property (nonatomic, strong) UILabel *countLabel;
+@property (nonatomic, strong) UILabel *scoreLabel;
+
 @property NSInteger count;
+@property NSInteger score;
+
 @end
 
 @implementation ViewController
@@ -42,9 +46,16 @@
     CGRect countRect = CGRectMake(self.view.frame.size.width / 2 - 10, self.view.frame.size.height / 2 - 10, 50, 50);
     self.countLabel = [[UILabel alloc] initWithFrame:countRect];
     self.countLabel.textColor = [UIColor whiteColor];
-    [[self countLabel] setFont:[UIFont fontWithName:@"Futura-Medium" size:40]];
-
+    self.countLabel.font = [UIFont fontWithName:@"Futura-Medium" size:40];
     [self.view addSubview:self.countLabel];
+
+    CGRect scoreRect = CGRectMake(self.view.frame.size.width / 2 - 10, 20, 50, 50);
+    self.scoreLabel = [[UILabel alloc] initWithFrame:scoreRect];
+    self.scoreLabel.textColor = [UIColor whiteColor];
+    self.scoreLabel.font = [UIFont fontWithName:@"Futura-Medium" size:40];
+    self.score = 0;
+    self.scoreLabel.text = [NSString stringWithFormat:@"%ld", (long)self.score];
+    [self.view addSubview:self.scoreLabel];
 
     
     [self createBall];
@@ -84,7 +95,7 @@
     [self.collisionBehavior addBoundaryWithIdentifier:@"bottom" fromPoint:CGPointMake(1, self.view.frame.size.height - 1) toPoint:CGPointMake(self.view.frame.size.width - 1, self.view.frame.size.height - 1)];
     [self.collisionBehavior addBoundaryWithIdentifier:@"right" fromPoint:CGPointMake(self.view.frame.size.width - 1, 1) toPoint:CGPointMake(self.view.frame.size.width - 1, self.view.frame.size.height - 1)];
     [self.collisionBehavior addBoundaryWithIdentifier:@"left" fromPoint:CGPointMake(1, 1) toPoint:CGPointMake(1, self.view.frame.size.height - 1)];
-    [self.animator addBehavior:self.collisionBehavior];
+        [self.animator addBehavior:self.collisionBehavior];
 
     
     self.leftPaddleGesture = [[UIPanGestureRecognizer alloc] initWithTarget:self action:@selector(leftPanFired:)];
@@ -93,6 +104,7 @@
     self.rightPaddleGesture = [[UIPanGestureRecognizer alloc] initWithTarget:self action:@selector(rightPanFired:)];
     [self.rightPaddleView addGestureRecognizer:self.rightPaddleGesture];
     
+
 }
 
 
@@ -141,6 +153,7 @@
     [self.animator addBehavior:self.pushBehavior];
 }
 
+
 - (void) startTimer {
     self.count = 4;
     [NSTimer scheduledTimerWithTimeInterval:.5 target:self selector:@selector(countdownTimer:) userInfo:nil repeats:YES];
@@ -150,14 +163,11 @@
 
     self.count--;
     self.countLabel.text = [NSString stringWithFormat:@"%ld", (long)self.count];
-        NSLog(@"%ld", (long)self.count);
         if (self.count == 0) {
-            NSLog(@"go");
             self.countLabel.text = @"";
             [timer invalidate];
             [self createBall];
             [self pushBall];
-        
     }
 }
 
@@ -165,8 +175,25 @@
    withBoundaryIdentifier:(id<NSCopying>)identifier atPoint:(CGPoint)p {
    NSString *boundary = (NSString *)identifier;
     if ([boundary isEqualToString:@"right"] || [boundary isEqualToString:@"left"]) {
+        self.score = 0;
+        self.scoreLabel.text = [NSString stringWithFormat:@"%ld", (long)self.score];
         [self removeBall];
         [self startTimer];
+        
+    }
+}
+
+-(void)collisionBehavior:(UICollisionBehavior *)behavior beganContactForItem:(id)item1 withItem:(id)item2 atPoint:(CGPoint)p{
+    
+    if ((item1 == self.ballView || item2 == self.ballView) && (item1 == self.leftPaddleView || item2 == self.leftPaddleView)) {
+        NSLog(@"left hit");
+        self.score++;
+        self.scoreLabel.text = [NSString stringWithFormat:@"%ld", (long)self.score];
+    }
+    else if ((item1 == self.ballView || item2 == self.ballView) && (item1 == self.rightPaddleView || item2 == self.rightPaddleView)) {
+        NSLog(@"right hit");
+        self.score++;
+        self.scoreLabel.text = [NSString stringWithFormat:@"%ld", (long)self.score];
     }
 }
 
