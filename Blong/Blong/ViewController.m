@@ -12,15 +12,25 @@
 
 @property (nonatomic, strong) UIDynamicAnimator *animator;
 @property (nonatomic, strong) UIView *ballView;
-@property (nonatomic, strong) UIView *paddleView;
-@property (nonatomic, strong) UIView *AIPaddleView;
-@property (nonatomic, strong) UIPanGestureRecognizer *paddleGesture;
-@property (nonatomic, strong) UIGravityBehavior *gravityBehavior;
+@property (nonatomic, strong) UIView *leftPaddleView;
+@property (nonatomic, strong) UIView *rightPaddleView;
+@property (nonatomic, strong) UIPanGestureRecognizer *leftPaddleGesture;
+@property (nonatomic, strong) UIPanGestureRecognizer *rightPaddleGesture;
+
 @property (nonatomic, strong) UICollisionBehavior *collisionBehavior;
 @property (nonatomic, strong) UIPushBehavior *pushBehavior;
-@property (nonatomic, strong) UIDynamicItemBehavior *paddleBehavior;
-@property (nonatomic, strong) UIDynamicItemBehavior *AIPaddleBehavior;
+@property (nonatomic, strong) UIDynamicItemBehavior *leftPaddleBehavior;
+@property (nonatomic, strong) UIDynamicItemBehavior *rightPaddleBehavior;
 @property (nonatomic, strong) UIDynamicItemBehavior *ballBehavior;
+@property (nonatomic, strong) UIImageView *bgView;
+
+
+@property (nonatomic, strong) UILabel *countLabel;
+@property (nonatomic, strong) UILabel *scoreLabel;
+
+@property NSInteger count;
+@property NSInteger score;
+
 @end
 
 @implementation ViewController
@@ -29,82 +39,100 @@
     [super viewDidLoad];
     self.animator = [[UIDynamicAnimator new] initWithReferenceView:self.view];
     
+    self.bgView = [[UIImageView alloc] initWithImage:[UIImage animatedImageNamed:@"pong-" duration:1.0f]
+];
+    self.bgView.frame = CGRectMake(0, 0, self.view.frame.size.width, self.view.frame.size.height);
+    [self.view addSubview:self.bgView];
    
+    
+    CGRect countRect = CGRectMake(self.view.frame.size.width / 2 - 12, self.view.frame.size.height / 2 - 10, 50, 50);
+    self.countLabel = [[UILabel alloc] initWithFrame:countRect];
+    self.countLabel.textColor = [UIColor whiteColor];
+    self.countLabel.font = [UIFont fontWithName:@"Menlo-Bold" size:40];
+    [self.view addSubview:self.countLabel];
+
+    CGRect scoreRect = CGRectMake(self.view.frame.size.width / 2 - 12, 20, 50, 50);
+    self.scoreLabel = [[UILabel alloc] initWithFrame:scoreRect];
+    self.scoreLabel.textColor = [UIColor whiteColor];
+    self.scoreLabel.font = [UIFont fontWithName:@"Menlo-Bold" size:40];
+    self.score = 0;
+    self.scoreLabel.text = [NSString stringWithFormat:@"%ld", (long)self.score];
+    [self.view addSubview:self.scoreLabel];
+
+    
     [self createBall];
     [self pushBall];
-
-
-//    self.gravityBehavior = [[UIGravityBehavior alloc] initWithItems:@[self.ballView]];
-//    self.gravityBehavior.magnitude = 0.5;
-//    [self.animator addBehavior:self.gravityBehavior];
-   
-    
-    CGRect paddleRect = CGRectMake(20, self.view.bounds.size.height / 2, 10, 50);
-    self.paddleView = [[UIView alloc] initWithFrame:paddleRect];
-    self.paddleView.backgroundColor = [UIColor blackColor];
-    self.paddleView.layer.cornerRadius = 5;
-    [self.view addSubview:self.paddleView];
     
     
-    CGRect AIPaddleRect = CGRectMake(self.view.bounds.size.width - 30, self.view.bounds.size.height / 2, 10, 50);
-    self.AIPaddleView = [[UIView alloc] initWithFrame:AIPaddleRect];
-    self.AIPaddleView.backgroundColor = [UIColor blackColor];
-    self.AIPaddleView.layer.cornerRadius = 5;
-    [self.view addSubview:self.AIPaddleView];
+    CGRect leftPaddleRect = CGRectMake(10, self.view.bounds.size.height / 2, 40, 60);
+    self.leftPaddleView = [[UIView alloc] initWithFrame:leftPaddleRect];
+    self.leftPaddleView.backgroundColor = [UIColor whiteColor];
+    self.leftPaddleView.layer.cornerRadius = 5;
+    [self.view addSubview:self.leftPaddleView];
     
     
-    self.paddleBehavior = [[UIDynamicItemBehavior alloc] initWithItems:@[self.paddleView]];
-    self.paddleBehavior.density = 1000;
-    self.paddleBehavior.allowsRotation = NO;
-    [self.animator addBehavior:self.paddleBehavior];
+    CGRect rightPaddleRect = CGRectMake(self.view.bounds.size.width - 50, self.view.bounds.size.height / 2, 40, 60);
+    self.rightPaddleView = [[UIView alloc] initWithFrame:rightPaddleRect];
+    self.rightPaddleView.backgroundColor = [UIColor whiteColor];
+    self.rightPaddleView.layer.cornerRadius = 5;
+    [self.view addSubview:self.rightPaddleView];
     
     
-    self.AIPaddleBehavior = [[UIDynamicItemBehavior alloc] initWithItems:@[self.AIPaddleView]];
-    self.AIPaddleBehavior.density = 1000;
-    self.AIPaddleBehavior.allowsRotation = NO;
-    [self.animator addBehavior:self.AIPaddleBehavior];
+    self.leftPaddleBehavior = [[UIDynamicItemBehavior alloc] initWithItems:@[self.leftPaddleView]];
+    self.leftPaddleBehavior.density = 1000;
+    self.leftPaddleBehavior.allowsRotation = NO;
+    [self.animator addBehavior:self.leftPaddleBehavior];
     
     
-    self.collisionBehavior = [[UICollisionBehavior alloc] initWithItems:@[self.ballView, self.paddleView, self.AIPaddleView]];
+    self.leftPaddleBehavior = [[UIDynamicItemBehavior alloc] initWithItems:@[self.rightPaddleView]];
+    self.leftPaddleBehavior.density = 1000;
+    self.leftPaddleBehavior.allowsRotation = NO;
+    [self.animator addBehavior:self.leftPaddleBehavior];
+    
+    
+    self.collisionBehavior = [[UICollisionBehavior alloc] initWithItems:@[self.ballView, self.leftPaddleView, self.rightPaddleView]];
     self.collisionBehavior.collisionDelegate = self;
     self.collisionBehavior.translatesReferenceBoundsIntoBoundary = NO;
     [self.collisionBehavior addBoundaryWithIdentifier:@"top" fromPoint:CGPointMake(1, 1) toPoint:CGPointMake(self.view.frame.size.width - 1, 1)];
     [self.collisionBehavior addBoundaryWithIdentifier:@"bottom" fromPoint:CGPointMake(1, self.view.frame.size.height - 1) toPoint:CGPointMake(self.view.frame.size.width - 1, self.view.frame.size.height - 1)];
     [self.collisionBehavior addBoundaryWithIdentifier:@"right" fromPoint:CGPointMake(self.view.frame.size.width - 1, 1) toPoint:CGPointMake(self.view.frame.size.width - 1, self.view.frame.size.height - 1)];
     [self.collisionBehavior addBoundaryWithIdentifier:@"left" fromPoint:CGPointMake(1, 1) toPoint:CGPointMake(1, self.view.frame.size.height - 1)];
-    [self.animator addBehavior:self.collisionBehavior];
+        [self.animator addBehavior:self.collisionBehavior];
 
     
-    self.paddleGesture = [[UIPanGestureRecognizer alloc] initWithTarget:self action:@selector(panFired:)];
-//    [self.view addGestureRecognizer:self.paddleGesture];
-    [self.paddleView addGestureRecognizer:self.paddleGesture];
+    self.leftPaddleGesture = [[UIPanGestureRecognizer alloc] initWithTarget:self action:@selector(leftPanFired:)];
+    [self.leftPaddleView addGestureRecognizer:self.leftPaddleGesture];
     
-    [NSTimer scheduledTimerWithTimeInterval:0.25f
-                                     target:self
-                                   selector:@selector(updateTime:)
-                                   userInfo:nil
-                                    repeats:YES];
+    self.rightPaddleGesture = [[UIPanGestureRecognizer alloc] initWithTarget:self action:@selector(rightPanFired:)];
+    [self.rightPaddleView addGestureRecognizer:self.rightPaddleGesture];
+    
+
 }
 
 
-- (void) panFired:(UIPanGestureRecognizer *)recognizer {
-  //  if (recognizer.state == UIGestureRecognizerStateChanged) {
+- (void) leftPanFired:(UIPanGestureRecognizer *)recognizer {
         CGPoint newPaddleCenter = [recognizer locationInView:self.view];
-        self.paddleView.center = CGPointMake(self.paddleView.center.x, newPaddleCenter.y);
-        [self.animator updateItemUsingCurrentState:self.paddleView];
-  //  }
+    self.leftPaddleView.center = CGPointMake(self.leftPaddleView.center.x, newPaddleCenter.y);
+        [self.animator updateItemUsingCurrentState:self.leftPaddleView];
 }
+
+- (void) rightPanFired:(UIPanGestureRecognizer *)recognizer {
+    CGPoint newPaddleCenter = [recognizer locationInView:self.view];
+    self.rightPaddleView.center = CGPointMake(self.rightPaddleView.center.x, newPaddleCenter.y);
+    [self.animator updateItemUsingCurrentState:self.rightPaddleView];
+}
+
 
 - (void)createBall {
     CGRect ballRect = CGRectMake(self.view.bounds.size.width / 2, self.view.bounds.size.height / 2, 16, 16);
     self.ballView = [[UIView alloc] initWithFrame:ballRect];
-    self.ballView.backgroundColor = [UIColor blackColor];
+    self.ballView.backgroundColor = [UIColor whiteColor];
     self.ballView.layer.cornerRadius = 8;
     [self.view addSubview:self.ballView];
     
     self.ballBehavior = [[UIDynamicItemBehavior alloc] initWithItems:@[self.ballView]];
     self.ballBehavior.resistance = 0;
-    self.ballBehavior.elasticity = 1;
+    self.ballBehavior.elasticity = 1.025;
     self.ballBehavior.friction = 0;
     self.ballBehavior.allowsRotation = NO;
     [self.animator addBehavior:self.ballBehavior];
@@ -122,53 +150,69 @@
 - (void) pushBall {
     self.pushBehavior = [[UIPushBehavior alloc] initWithItems:@[self.ballView] mode:UIPushBehaviorModeInstantaneous];
     self.pushBehavior.angle = 4.05;
-    self.pushBehavior.magnitude = 0.08;
+    self.pushBehavior.magnitude = 0.10;
     self.pushBehavior.active = YES;
     [self.animator addBehavior:self.pushBehavior];
+}
+
+
+- (void) startTimer {
+    self.count = 4;
+    [NSTimer scheduledTimerWithTimeInterval:.5 target:self selector:@selector(countdownTimer:) userInfo:nil repeats:YES];
+}
+
+-(void) countdownTimer:(NSTimer*)timer{
+
+    self.count--;
+    self.countLabel.text = [NSString stringWithFormat:@"%ld", (long)self.count];
+        if (self.count == 0) {
+            self.countLabel.text = @"";
+            [timer invalidate];
+            [self createBall];
+            [self pushBall];
+    }
 }
 
 - (void)collisionBehavior:(UICollisionBehavior *)behavior beganContactForItem:(id<UIDynamicItem>)item
    withBoundaryIdentifier:(id<NSCopying>)identifier atPoint:(CGPoint)p {
    NSString *boundary = (NSString *)identifier;
-    if ([boundary isEqualToString:@"top"]) {
-        NSLog(@"top hit");
-    }
-    else if ([boundary isEqualToString:@"bottom"]) {
-        NSLog(@"bottom hit");
-    }
-    else if ([boundary isEqualToString:@"right"]) {
-        NSLog(@"right hit");
+    if ([boundary isEqualToString:@"right"] || [boundary isEqualToString:@"left"]) {
+        self.score = 0;
+        self.scoreLabel.text = [NSString stringWithFormat:@"%ld", (long)self.score];
         [self removeBall];
-        [self createBall];
-        [self pushBall];
+        [self startTimer];
+        
     }
-    else if ([boundary isEqualToString:@"left"]) {
-        NSLog(@"left hit");
-        [self removeBall];
-        [self createBall];
-        [self pushBall];
-    }
-
 }
 
--(void)updateTime: (NSTimer *) timer {
-    CGPoint ballCenter = CGPointMake(self.ballView.center.x, self.ballView.center.y);
-    NSLog(@"%@", NSStringFromCGPoint(ballCenter));
-    if (ballCenter.x > self.view.frame.size.width / 2) {
-        
-    
-    [UIView animateWithDuration:0.35
-                          delay:0.0
-                        options: UIViewAnimationOptionTransitionNone
-                     animations:^{
-                            self.AIPaddleView.center = CGPointMake(self.AIPaddleView.center.x, ballCenter.y);                     }
-                     completion:^(BOOL finished){
-                         NSLog(@"Done!");
-                     }];
-    }
-    
-    [self.animator updateItemUsingCurrentState:self.AIPaddleView];
+-(void)collisionBehavior:(UICollisionBehavior *)behavior beganContactForItem:(id)item1 withItem:(id)item2 atPoint:(CGPoint)p{
 
+    if ((item1 == self.ballView || item2 == self.ballView) && (item1 == self.leftPaddleView || item2 == self.leftPaddleView)) {
+        if (p.x > self.leftPaddleView.frame.origin.x + self.leftPaddleView.frame.size.width) {
+            [self bgChange];
+            NSLog(@"left hit");
+            self.score++;
+            self.scoreLabel.text = [NSString stringWithFormat:@"%ld", (long)self.score];
+        }
+    }
+    else if ((item1 == self.ballView || item2 == self.ballView) && (item1 == self.rightPaddleView || item2 == self.rightPaddleView)) {
+        if (p.x < self.rightPaddleView.frame.origin.x) {
+            [self bgChange];
+            NSLog(@"right hit");
+            self.score++;
+            self.scoreLabel.text = [NSString stringWithFormat:@"%ld", (long)self.score];
+        }
+    }
+}
+
+- (void)bgChange {
+    self.bgView.image = [UIImage animatedImageNamed:@"pongbg-" duration:1.0f];
+    [NSTimer scheduledTimerWithTimeInterval:1.0f target:self selector:@selector(bgChangeBack) userInfo:nil repeats:NO];
+}
+
+- (void)bgChangeBack
+{
+    self.bgView.image = [UIImage animatedImageNamed:@"pong-" duration:1.0f];
 }
 
 - (void)didReceiveMemoryWarning {
