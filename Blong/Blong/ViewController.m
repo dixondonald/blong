@@ -22,6 +22,7 @@
 @property (nonatomic, strong) UIDynamicItemBehavior *leftPaddleBehavior;
 @property (nonatomic, strong) UIDynamicItemBehavior *rightPaddleBehavior;
 @property (nonatomic, strong) UIDynamicItemBehavior *ballBehavior;
+@property (nonatomic, strong) UIImageView *bgView;
 
 
 @property (nonatomic, strong) UILabel *countLabel;
@@ -38,21 +39,22 @@
     [super viewDidLoad];
     self.animator = [[UIDynamicAnimator new] initWithReferenceView:self.view];
     
-    UIImageView *bgView = [[UIImageView alloc] initWithImage:[UIImage imageNamed:@"pongbg"]];
-    bgView.frame = CGRectMake(0, 0, self.view.frame.size.width, self.view.frame.size.height);
-    [self.view addSubview:bgView];
+    self.bgView = [[UIImageView alloc] initWithImage:[UIImage animatedImageNamed:@"pong-" duration:1.0f]
+];
+    self.bgView.frame = CGRectMake(0, 0, self.view.frame.size.width, self.view.frame.size.height);
+    [self.view addSubview:self.bgView];
    
     
-    CGRect countRect = CGRectMake(self.view.frame.size.width / 2 - 10, self.view.frame.size.height / 2 - 10, 50, 50);
+    CGRect countRect = CGRectMake(self.view.frame.size.width / 2 - 12, self.view.frame.size.height / 2 - 10, 50, 50);
     self.countLabel = [[UILabel alloc] initWithFrame:countRect];
     self.countLabel.textColor = [UIColor whiteColor];
-    self.countLabel.font = [UIFont fontWithName:@"Futura-Medium" size:40];
+    self.countLabel.font = [UIFont fontWithName:@"Menlo-Bold" size:40];
     [self.view addSubview:self.countLabel];
 
-    CGRect scoreRect = CGRectMake(self.view.frame.size.width / 2 - 10, 20, 50, 50);
+    CGRect scoreRect = CGRectMake(self.view.frame.size.width / 2 - 12, 20, 50, 50);
     self.scoreLabel = [[UILabel alloc] initWithFrame:scoreRect];
     self.scoreLabel.textColor = [UIColor whiteColor];
-    self.scoreLabel.font = [UIFont fontWithName:@"Futura-Medium" size:40];
+    self.scoreLabel.font = [UIFont fontWithName:@"Menlo-Bold" size:40];
     self.score = 0;
     self.scoreLabel.text = [NSString stringWithFormat:@"%ld", (long)self.score];
     [self.view addSubview:self.scoreLabel];
@@ -184,17 +186,33 @@
 }
 
 -(void)collisionBehavior:(UICollisionBehavior *)behavior beganContactForItem:(id)item1 withItem:(id)item2 atPoint:(CGPoint)p{
-    
+
     if ((item1 == self.ballView || item2 == self.ballView) && (item1 == self.leftPaddleView || item2 == self.leftPaddleView)) {
-        NSLog(@"left hit");
-        self.score++;
-        self.scoreLabel.text = [NSString stringWithFormat:@"%ld", (long)self.score];
+        if (p.x > self.leftPaddleView.frame.origin.x + self.leftPaddleView.frame.size.width) {
+            [self bgChange];
+            NSLog(@"left hit");
+            self.score++;
+            self.scoreLabel.text = [NSString stringWithFormat:@"%ld", (long)self.score];
+        }
     }
     else if ((item1 == self.ballView || item2 == self.ballView) && (item1 == self.rightPaddleView || item2 == self.rightPaddleView)) {
-        NSLog(@"right hit");
-        self.score++;
-        self.scoreLabel.text = [NSString stringWithFormat:@"%ld", (long)self.score];
+        if (p.x < self.rightPaddleView.frame.origin.x) {
+            [self bgChange];
+            NSLog(@"right hit");
+            self.score++;
+            self.scoreLabel.text = [NSString stringWithFormat:@"%ld", (long)self.score];
+        }
     }
+}
+
+- (void)bgChange {
+    self.bgView.image = [UIImage animatedImageNamed:@"pongbg-" duration:1.0f];
+    [NSTimer scheduledTimerWithTimeInterval:1.0f target:self selector:@selector(bgChangeBack) userInfo:nil repeats:NO];
+}
+
+- (void)bgChangeBack
+{
+    self.bgView.image = [UIImage animatedImageNamed:@"pong-" duration:1.0f];
 }
 
 - (void)didReceiveMemoryWarning {
