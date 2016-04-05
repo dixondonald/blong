@@ -7,8 +7,9 @@
 //
 
 #import "ViewController.h"
+#import <AVFoundation/AVFoundation.h>
 
-@interface ViewController () <UICollisionBehaviorDelegate>
+@interface ViewController () <UICollisionBehaviorDelegate> 
 
 @property (nonatomic, strong) UIDynamicAnimator *animator;
 @property (nonatomic, strong) UIView *ballView;
@@ -31,11 +32,17 @@
 @property (nonatomic, strong) UIDynamicItemBehavior *thirdBallBehavior;
 
 @property (nonatomic, strong) UIImageView *bgView;
+@property (nonatomic, strong) UIImage *anim;
 
 @property (nonatomic, strong) NSArray *angles;
+@property (nonatomic) float ballSpeed;
+
+@property(nonatomic, strong) AVAudioPlayer *backgroundMusic;
 
 @property (nonatomic, strong) UILabel *countLabel;
 @property (nonatomic, strong) UILabel *scoreLabel;
+
+
 
 @property BOOL isBall;
 @property BOOL isExtraBall;
@@ -45,6 +52,9 @@
 @property NSInteger count;
 @property NSInteger score;
 
+@property NSTimer *bgTimer;
+
+
 @end
 
 @implementation ViewController
@@ -52,31 +62,43 @@
 - (void)viewDidLoad {
     [super viewDidLoad];
     self.animator = [[UIDynamicAnimator new] initWithReferenceView:self.view];
+    
+    NSURL *musicFile = [[NSBundle mainBundle] URLForResource:@"pongulator120CS"
+                                               withExtension:@"mp3"];
+    self.backgroundMusic = [[AVAudioPlayer alloc] initWithContentsOfURL:musicFile
+                                                                  error:nil];
+    self.backgroundMusic.volume = .3;
+    self.backgroundMusic.numberOfLoops = -1;
+    [self.backgroundMusic play];
+
+    
     self.ballAmount = 0;
     
     self.angles = [[NSArray alloc] initWithObjects:@1.0f, @2.5f, @4.0f, @5.35f, @7.0f, @8.5f, @10.15f, @11.75f, nil];
     
-    self.bgView = [[UIImageView alloc] initWithImage:[UIImage animatedImageNamed:@"pong-" duration:1.0f]
+    self.bgView = [[UIImageView alloc] initWithImage:[UIImage animatedImageNamed:@"pong-" duration:.75f]
 ];
     self.bgView.frame = CGRectMake(0, 0, self.view.frame.size.width, self.view.frame.size.height);
     [self.view addSubview:self.bgView];
-   
-    
+
+    self.anim = [UIImage animatedImageNamed:@"pongbg-" duration:1.0f];
+  
     CGRect countRect = CGRectMake(self.view.frame.size.width / 2 - 12, self.view.frame.size.height / 2 - 10, 50, 50);
     self.countLabel = [[UILabel alloc] initWithFrame:countRect];
     self.countLabel.textColor = [UIColor whiteColor];
     self.countLabel.font = [UIFont fontWithName:@"Menlo-Bold" size:40];
     [self.view addSubview:self.countLabel];
 
-    CGRect scoreRect = CGRectMake(self.view.frame.size.width / 2 - 12, 20, 50, 50);
+    CGRect scoreRect = CGRectMake(self.view.frame.size.width / 2 - 25, 10, 50, 50);
     self.scoreLabel = [[UILabel alloc] initWithFrame:scoreRect];
     self.scoreLabel.textColor = [UIColor whiteColor];
+    self.scoreLabel.textAlignment = NSTextAlignmentCenter;
     self.scoreLabel.font = [UIFont fontWithName:@"Menlo-Bold" size:40];
     self.score = 0;
     self.scoreLabel.text = [NSString stringWithFormat:@"%ld", (long)self.score];
     [self.view addSubview:self.scoreLabel];
 
-    
+    self.ballSpeed = .10;
     [self createBall];
     [self pushBall];
     
@@ -123,7 +145,6 @@
     self.rightPaddleGesture = [[UIPanGestureRecognizer alloc] initWithTarget:self action:@selector(rightPanFired:)];
     [self.rightPaddleView addGestureRecognizer:self.rightPaddleGesture];
     
-
 }
 
 
@@ -226,28 +247,31 @@
 }
 
 - (void) pushBall {
-    float randomAngle = [self.angles[arc4random_uniform(self.angles.count)] floatValue];
+    NSInteger offset = arc4random() % self.angles.count;
+    float randomAngle = [self.angles [offset] floatValue];
     self.pushBehavior = [[UIPushBehavior alloc] initWithItems:@[self.ballView] mode:UIPushBehaviorModeInstantaneous];
     self.pushBehavior.angle = randomAngle;
-    self.pushBehavior.magnitude = 0.11;
+    self.pushBehavior.magnitude = self.ballSpeed;
     self.pushBehavior.active = YES;
     [self.animator addBehavior:self.pushBehavior];
 }
 
 - (void) pushExtraBall {
-    float randomAngle = [self.angles[arc4random_uniform(self.angles.count)] floatValue];
+    NSInteger offset = arc4random() % self.angles.count;
+    float randomAngle = [self.angles [offset] floatValue];
     self.extraPushBehavior = [[UIPushBehavior alloc] initWithItems:@[self.extraBallView] mode:UIPushBehaviorModeInstantaneous];
     self.extraPushBehavior.angle = randomAngle;
-    self.extraPushBehavior.magnitude = 0.11;
+    self.extraPushBehavior.magnitude = self.ballSpeed;
     self.extraPushBehavior.active = YES;
     [self.animator addBehavior:self.extraPushBehavior];
 }
 
 - (void) pushThirdBall {
-    float randomAngle = [self.angles[arc4random_uniform(self.angles.count)] floatValue];
+    NSInteger offset = arc4random() % self.angles.count;
+    float randomAngle = [self.angles [offset] floatValue];
     self.thirdPushBehavior = [[UIPushBehavior alloc] initWithItems:@[self.thirdBallView] mode:UIPushBehaviorModeInstantaneous];
     self.thirdPushBehavior.angle = randomAngle;
-    self.thirdPushBehavior.magnitude = 0.11;
+    self.thirdPushBehavior.magnitude = self.ballSpeed;
     self.thirdPushBehavior.active = YES;
     [self.animator addBehavior:self.thirdPushBehavior];
 }
@@ -307,7 +331,6 @@
     if ((item1 == self.ballView || item2 == self.ballView) && (item1 == self.leftPaddleView || item2 == self.leftPaddleView)) {
         if (p.x > self.leftPaddleView.frame.origin.x + self.leftPaddleView.frame.size.width) {
             [self bgChange];
-            NSLog(@"left hit");
             self.score++;
             self.scoreLabel.text = [NSString stringWithFormat:@"%ld", (long)self.score];
             if (self.score % 10 == 0) {
@@ -329,7 +352,6 @@
     else if ((item1 == self.ballView || item2 == self.ballView) && (item1 == self.rightPaddleView || item2 == self.rightPaddleView)) {
         if (p.x < self.rightPaddleView.frame.origin.x) {
             [self bgChange];
-            NSLog(@"right hit");
             self.score++;
             self.scoreLabel.text = [NSString stringWithFormat:@"%ld", (long)self.score];
             if (self.score % 10 == 0) {
@@ -352,7 +374,6 @@
     else if ((item1 == self.extraBallView || item2 == self.extraBallView) && (item1 == self.leftPaddleView || item2 == self.leftPaddleView)) {
         if (p.x > self.leftPaddleView.frame.origin.x + self.leftPaddleView.frame.size.width) {
             [self bgChange];
-            NSLog(@"left hit");
             self.score++;
             self.scoreLabel.text = [NSString stringWithFormat:@"%ld", (long)self.score];
             if (self.score % 10 == 0) {
@@ -375,7 +396,6 @@
     else if ((item1 == self.extraBallView || item2 == self.extraBallView) && (item1 == self.rightPaddleView || item2 == self.rightPaddleView)) {
         if (p.x < self.rightPaddleView.frame.origin.x) {
             [self bgChange];
-            NSLog(@"right hit");
             self.score++;
             self.scoreLabel.text = [NSString stringWithFormat:@"%ld", (long)self.score];
             if (self.score % 10 == 0) {
@@ -398,7 +418,6 @@
     else if ((item1 == self.thirdBallView || item2 == self.thirdBallView) && (item1 == self.leftPaddleView || item2 == self.leftPaddleView)) {
         if (p.x > self.leftPaddleView.frame.origin.x + self.leftPaddleView.frame.size.width) {
             [self bgChange];
-            NSLog(@"left hit");
             self.score++;
             self.scoreLabel.text = [NSString stringWithFormat:@"%ld", (long)self.score];
             if (self.score % 10 == 0) {
@@ -420,7 +439,6 @@
     else if ((item1 == self.thirdBallView || item2 == self.thirdBallView) && (item1 == self.rightPaddleView || item2 == self.rightPaddleView)) {
         if (p.x < self.rightPaddleView.frame.origin.x) {
             [self bgChange];
-            NSLog(@"right hit");
             self.score++;
             self.scoreLabel.text = [NSString stringWithFormat:@"%ld", (long)self.score];
             if (self.score % 10 == 0) {
@@ -443,13 +461,15 @@
 }
 
 - (void)bgChange {
-//    self.bgView.image = [UIImage animatedImageNamed:@"pongbg-" duration:1.0f];
-    [NSTimer scheduledTimerWithTimeInterval:1.0f target:self selector:@selector(bgChangeBack) userInfo:nil repeats:NO];
+    [self.bgTimer invalidate];
+    self.bgView.image = self.anim;
+    self.bgTimer = [NSTimer scheduledTimerWithTimeInterval:.95f target:self selector:@selector(bgChangeBack) userInfo:nil repeats:NO];
 }
 
 - (void)bgChangeBack
 {
-//    self.bgView.image = [UIImage animatedImageNamed:@"pong-" duration:1.0f];
+    self.bgView.image = [UIImage animatedImageNamed:@"pong-" duration:.75f];
+    [self.bgTimer invalidate];
 }
 
 - (void)didReceiveMemoryWarning {

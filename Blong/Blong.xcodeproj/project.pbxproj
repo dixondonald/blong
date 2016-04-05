@@ -15,6 +15,8 @@
 		824B84D51C9727290009C182 /* LaunchScreen.storyboard in Resources */ = {isa = PBXBuildFile; fileRef = 824B84D31C9727290009C182 /* LaunchScreen.storyboard */; };
 		824B84E01C97272A0009C182 /* BlongTests.m in Sources */ = {isa = PBXBuildFile; fileRef = 824B84DF1C97272A0009C182 /* BlongTests.m */; };
 		824B84EB1C97272A0009C182 /* BlongUITests.m in Sources */ = {isa = PBXBuildFile; fileRef = 824B84EA1C97272A0009C182 /* BlongUITests.m */; };
+		827BF3C31CB4486C00910511 /* AVFoundation.framework in Frameworks */ = {isa = PBXBuildFile; fileRef = 827BF3C21CB4486B00910511 /* AVFoundation.framework */; };
+		827BF3C51CB4527D00910511 /* pongulator120CS.mp3 in Resources */ = {isa = PBXBuildFile; fileRef = 827BF3C41CB4527D00910511 /* pongulator120CS.mp3 */; };
 /* End PBXBuildFile section */
 
 /* Begin PBXContainerItemProxy section */
@@ -51,6 +53,8 @@
 		824B84E61C97272A0009C182 /* BlongUITests.xctest */ = {isa = PBXFileReference; explicitFileType = wrapper.cfbundle; includeInIndex = 0; path = BlongUITests.xctest; sourceTree = BUILT_PRODUCTS_DIR; };
 		824B84EA1C97272A0009C182 /* BlongUITests.m */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.c.objc; path = BlongUITests.m; sourceTree = "<group>"; };
 		824B84EC1C97272A0009C182 /* Info.plist */ = {isa = PBXFileReference; lastKnownFileType = text.plist.xml; path = Info.plist; sourceTree = "<group>"; };
+		827BF3C21CB4486B00910511 /* AVFoundation.framework */ = {isa = PBXFileReference; lastKnownFileType = wrapper.framework; name = AVFoundation.framework; path = System/Library/Frameworks/AVFoundation.framework; sourceTree = SDKROOT; };
+		827BF3C41CB4527D00910511 /* pongulator120CS.mp3 */ = {isa = PBXFileReference; lastKnownFileType = audio.mp3; name = pongulator120CS.mp3; path = ../../../../Documents/pongulator120CS.mp3; sourceTree = "<group>"; };
 /* End PBXFileReference section */
 
 /* Begin PBXFrameworksBuildPhase section */
@@ -58,6 +62,7 @@
 			isa = PBXFrameworksBuildPhase;
 			buildActionMask = 2147483647;
 			files = (
+				827BF3C31CB4486C00910511 /* AVFoundation.framework in Frameworks */,
 			);
 			runOnlyForDeploymentPostprocessing = 0;
 		};
@@ -81,6 +86,7 @@
 		824B84B91C9727290009C182 = {
 			isa = PBXGroup;
 			children = (
+				827BF3C21CB4486B00910511 /* AVFoundation.framework */,
 				824B84C41C9727290009C182 /* Blong */,
 				824B84DE1C97272A0009C182 /* BlongTests */,
 				824B84E91C97272A0009C182 /* BlongUITests */,
@@ -106,6 +112,7 @@
 				824B84CB1C9727290009C182 /* ViewController.h */,
 				824B84CC1C9727290009C182 /* ViewController.m */,
 				824B84CE1C9727290009C182 /* Main.storyboard */,
+				827BF3C41CB4527D00910511 /* pongulator120CS.mp3 */,
 				824B84D11C9727290009C182 /* Assets.xcassets */,
 				824B84D31C9727290009C182 /* LaunchScreen.storyboard */,
 				824B84D61C9727290009C182 /* Info.plist */,
@@ -245,6 +252,7 @@
 			buildActionMask = 2147483647;
 			files = (
 				824B84D51C9727290009C182 /* LaunchScreen.storyboard in Resources */,
+				827BF3C51CB4527D00910511 /* pongulator120CS.mp3 in Resources */,
 				824B84D21C9727290009C182 /* Assets.xcassets in Resources */,
 				824B84D01C9727290009C182 /* Main.storyboard in Resources */,
 			);
