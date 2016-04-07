@@ -16,7 +16,13 @@
 		824B84E01C97272A0009C182 /* BlongTests.m in Sources */ = {isa = PBXBuildFile; fileRef = 824B84DF1C97272A0009C182 /* BlongTests.m */; };
 		824B84EB1C97272A0009C182 /* BlongUITests.m in Sources */ = {isa = PBXBuildFile; fileRef = 824B84EA1C97272A0009C182 /* BlongUITests.m */; };
 		827BF3C31CB4486C00910511 /* AVFoundation.framework in Frameworks */ = {isa = PBXBuildFile; fileRef = 827BF3C21CB4486B00910511 /* AVFoundation.framework */; };
-		827BF3C51CB4527D00910511 /* pongulator120CS.mp3 in Resources */ = {isa = PBXBuildFile; fileRef = 827BF3C41CB4527D00910511 /* pongulator120CS.mp3 */; };
+		82AD423A1CB6BE3100590DBF /* pongulator150.mp3 in Resources */ = {isa = PBXBuildFile; fileRef = 82AD42351CB6BE3100590DBF /* pongulator150.mp3 */; };
+		82AD423B1CB6BE3100590DBF /* pongulator140.mp3 in Resources */ = {isa = PBXBuildFile; fileRef = 82AD42361CB6BE3100590DBF /* pongulator140.mp3 */; };
+		82AD423C1CB6BE3100590DBF /* pongulator130.mp3 in Resources */ = {isa = PBXBuildFile; fileRef = 82AD42371CB6BE3100590DBF /* pongulator130.mp3 */; };
+		82AD423D1CB6BE3100590DBF /* pongulator120.mp3 in Resources */ = {isa = PBXBuildFile; fileRef = 82AD42381CB6BE3100590DBF /* pongulator120.mp3 */; };
+		82AD423E1CB6BE3100590DBF /* pongulator110.mp3 in Resources */ = {isa = PBXBuildFile; fileRef = 82AD42391CB6BE3100590DBF /* pongulator110.mp3 */; };
+		82AD42411CB6F92D00590DBF /* pongulatorretry.mp3 in Resources */ = {isa = PBXBuildFile; fileRef = 82AD423F1CB6F92C00590DBF /* pongulatorretry.mp3 */; };
+		82AD42421CB6F92D00590DBF /* pongulatormenu.mp3 in Resources */ = {isa = PBXBuildFile; fileRef = 82AD42401CB6F92C00590DBF /* pongulatormenu.mp3 */; };
 /* End PBXBuildFile section */
 
 /* Begin PBXContainerItemProxy section */
@@ -54,7 +60,13 @@
 		824B84EA1C97272A0009C182 /* BlongUITests.m */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.c.objc; path = BlongUITests.m; sourceTree = "<group>"; };
 		824B84EC1C97272A0009C182 /* Info.plist */ = {isa = PBXFileReference; lastKnownFileType = text.plist.xml; path = Info.plist; sourceTree = "<group>"; };
 		827BF3C21CB4486B00910511 /* AVFoundation.framework */ = {isa = PBXFileReference; lastKnownFileType = wrapper.framework; name = AVFoundation.framework; path = System/Library/Frameworks/AVFoundation.framework; sourceTree = SDKROOT; };
-		827BF3C41CB4527D00910511 /* pongulator120CS.mp3 */ = {isa = PBXFileReference; lastKnownFileType = audio.mp3; name = pongulator120CS.mp3; path = ../../../../Documents/pongulator120CS.mp3; sourceTree = "<group>"; };
+		82AD42351CB6BE3100590DBF /* pongulator150.mp3 */ = {isa = PBXFileReference; lastKnownFileType = audio.mp3; name = pongulator150.mp3; path = ../../../../Documents/pongulator150.mp3; sourceTree = "<group>"; };
+		82AD42361CB6BE3100590DBF /* pongulator140.mp3 */ = {isa = PBXFileReference; lastKnownFileType = audio.mp3; name = pongulator140.mp3; path = ../../../../Documents/pongulator140.mp3; sourceTree = "<group>"; };
+		82AD42371CB6BE3100590DBF /* pongulator130.mp3 */ = {isa = PBXFileReference; lastKnownFileType = audio.mp3; name = pongulator130.mp3; path = ../../../../Documents/pongulator130.mp3; sourceTree = "<group>"; };
+		82AD42381CB6BE3100590DBF /* pongulator120.mp3 */ = {isa = PBXFileReference; lastKnownFileType = audio.mp3; name = pongulator120.mp3; path = ../../../../Documents/pongulator120.mp3; sourceTree = "<group>"; };
+		82AD42391CB6BE3100590DBF /* pongulator110.mp3 */ = {isa = PBXFileReference; lastKnownFileType = audio.mp3; name = pongulator110.mp3; path = ../../../../Documents/pongulator110.mp3; sourceTree = "<group>"; };
+		82AD423F1CB6F92C00590DBF /* pongulatorretry.mp3 */ = {isa = PBXFileReference; lastKnownFileType = audio.mp3; name = pongulatorretry.mp3; path = ../../../../Documents/pongulatorretry.mp3; sourceTree = "<group>"; };
+		82AD42401CB6F92C00590DBF /* pongulatormenu.mp3 */ = {isa = PBXFileReference; lastKnownFileType = audio.mp3; name = pongulatormenu.mp3; path = ../../../../Documents/pongulatormenu.mp3; sourceTree = "<group>"; };
 /* End PBXFileReference section */
 
 /* Begin PBXFrameworksBuildPhase section */
@@ -112,7 +124,13 @@
 				824B84CB1C9727290009C182 /* ViewController.h */,
 				824B84CC1C9727290009C182 /* ViewController.m */,
 				824B84CE1C9727290009C182 /* Main.storyboard */,
-				827BF3C41CB4527D00910511 /* pongulator120CS.mp3 */,
+				82AD423F1CB6F92C00590DBF /* pongulatorretry.mp3 */,
+				82AD42401CB6F92C00590DBF /* pongulatormenu.mp3 */,
+				82AD42351CB6BE3100590DBF /* pongulator150.mp3 */,
+				82AD42361CB6BE3100590DBF /* pongulator140.mp3 */,
+				82AD42371CB6BE3100590DBF /* pongulator130.mp3 */,
+				82AD42381CB6BE3100590DBF /* pongulator120.mp3 */,
+				82AD42391CB6BE3100590DBF /* pongulator110.mp3 */,
 				824B84D11C9727290009C182 /* Assets.xcassets */,
 				824B84D31C9727290009C182 /* LaunchScreen.storyboard */,
 				824B84D61C9727290009C182 /* Info.plist */,
@@ -251,9 +269,15 @@
 			isa = PBXResourcesBuildPhase;
 			buildActionMask = 2147483647;
 			files = (
+				82AD423A1CB6BE3100590DBF /* pongulator150.mp3 in Resources */,
+				82AD42411CB6F92D00590DBF /* pongulatorretry.mp3 in Resources */,
+				82AD423B1CB6BE3100590DBF /* pongulator140.mp3 in Resources */,
 				824B84D51C9727290009C182 /* LaunchScreen.storyboard in Resources */,
-				827BF3C51CB4527D00910511 /* pongulator120CS.mp3 in Resources */,
+				82AD42421CB6F92D00590DBF /* pongulatormenu.mp3 in Resources */,
+				82AD423D1CB6BE3100590DBF /* pongulator120.mp3 in Resources */,
+				82AD423E1CB6BE3100590DBF /* pongulator110.mp3 in Resources */,
 				824B84D21C9727290009C182 /* Assets.xcassets in Resources */,
+				82AD423C1CB6BE3100590DBF /* pongulator130.mp3 in Resources */,
 				824B84D01C9727290009C182 /* Main.storyboard in Resources */,
 			);
 			runOnlyForDeploymentPostprocessing = 0;

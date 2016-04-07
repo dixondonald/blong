@@ -41,8 +41,16 @@
 
 @property (nonatomic, strong) UILabel *countLabel;
 @property (nonatomic, strong) UILabel *scoreLabel;
+@property (nonatomic, strong) UILabel *titleLabel;
+@property (nonatomic, strong) UIButton *retryButton;
+@property (nonatomic, strong) UIButton *menuButton;
+@property (nonatomic, strong) UIButton *easyButton;
+@property (nonatomic, strong) UIButton *mediumButton;
+@property (nonatomic, strong) UIButton *hardButton;
+@property (nonatomic, strong) UIButton *harderButton;
+@property (nonatomic, strong) UIButton *hardestButton;
 
-
+@property (nonatomic, strong) NSURL *musicFile;
 
 @property BOOL isBall;
 @property BOOL isExtraBall;
@@ -63,73 +71,33 @@
     [super viewDidLoad];
     self.animator = [[UIDynamicAnimator new] initWithReferenceView:self.view];
     
-    NSURL *musicFile = [[NSBundle mainBundle] URLForResource:@"pongulator120CS"
-                                               withExtension:@"mp3"];
-    self.backgroundMusic = [[AVAudioPlayer alloc] initWithContentsOfURL:musicFile
-                                                                  error:nil];
-    self.backgroundMusic.volume = .3;
-    self.backgroundMusic.numberOfLoops = -1;
-    [self.backgroundMusic play];
-
-    
-    self.ballAmount = 0;
-    
     self.angles = [[NSArray alloc] initWithObjects:@1.0f, @2.5f, @4.0f, @5.35f, @7.0f, @8.5f, @10.15f, @11.75f, nil];
-    
     self.bgView = [[UIImageView alloc] initWithImage:[UIImage animatedImageNamed:@"pong-" duration:.75f]
 ];
     self.bgView.frame = CGRectMake(0, 0, self.view.frame.size.width, self.view.frame.size.height);
     [self.view addSubview:self.bgView];
-
     self.anim = [UIImage animatedImageNamed:@"pongbg-" duration:1.0f];
-  
-    CGRect countRect = CGRectMake(self.view.frame.size.width / 2 - 12, self.view.frame.size.height / 2 - 10, 50, 50);
+    [self bgChange];
+    
+    [self createMenu];
+
+
+    CGRect countRect = CGRectMake(self.view.frame.size.width / 2 - 25, self.view.frame.size.height / 2 - 25, 50, 50);
     self.countLabel = [[UILabel alloc] initWithFrame:countRect];
     self.countLabel.textColor = [UIColor whiteColor];
-    self.countLabel.font = [UIFont fontWithName:@"Menlo-Bold" size:40];
+    self.countLabel.textAlignment = NSTextAlignmentCenter;
+    self.countLabel.font = [UIFont fontWithName:@"Futura" size:50];
     [self.view addSubview:self.countLabel];
 
-    CGRect scoreRect = CGRectMake(self.view.frame.size.width / 2 - 25, 10, 50, 50);
+    CGRect scoreRect = CGRectMake(self.view.frame.size.width / 2 - 25, 10, 50, 40);
     self.scoreLabel = [[UILabel alloc] initWithFrame:scoreRect];
     self.scoreLabel.textColor = [UIColor whiteColor];
     self.scoreLabel.textAlignment = NSTextAlignmentCenter;
-    self.scoreLabel.font = [UIFont fontWithName:@"Menlo-Bold" size:40];
+    self.scoreLabel.font = [UIFont fontWithName:@"Futura" size:40];
     self.score = 0;
-    self.scoreLabel.text = [NSString stringWithFormat:@"%ld", (long)self.score];
     [self.view addSubview:self.scoreLabel];
 
-    self.ballSpeed = .10;
-    [self createBall];
-    [self pushBall];
-    
-    
-    CGRect leftPaddleRect = CGRectMake(10, self.view.bounds.size.height / 2, 40, 60);
-    self.leftPaddleView = [[UIView alloc] initWithFrame:leftPaddleRect];
-    self.leftPaddleView.backgroundColor = [UIColor whiteColor];
-    self.leftPaddleView.layer.cornerRadius = 5;
-    [self.view addSubview:self.leftPaddleView];
-    
-    
-    CGRect rightPaddleRect = CGRectMake(self.view.bounds.size.width - 50, self.view.bounds.size.height / 2, 40, 60);
-    self.rightPaddleView = [[UIView alloc] initWithFrame:rightPaddleRect];
-    self.rightPaddleView.backgroundColor = [UIColor whiteColor];
-    self.rightPaddleView.layer.cornerRadius = 5;
-    [self.view addSubview:self.rightPaddleView];
-    
-    
-    self.leftPaddleBehavior = [[UIDynamicItemBehavior alloc] initWithItems:@[self.leftPaddleView]];
-    self.leftPaddleBehavior.density = 1000;
-    self.leftPaddleBehavior.allowsRotation = NO;
-    [self.animator addBehavior:self.leftPaddleBehavior];
-    
-    
-    self.leftPaddleBehavior = [[UIDynamicItemBehavior alloc] initWithItems:@[self.rightPaddleView]];
-    self.leftPaddleBehavior.density = 1000;
-    self.leftPaddleBehavior.allowsRotation = NO;
-    [self.animator addBehavior:self.leftPaddleBehavior];
-    
-    
-    self.collisionBehavior = [[UICollisionBehavior alloc] initWithItems:@[self.ballView, self.leftPaddleView, self.rightPaddleView]];
+    self.collisionBehavior = [[UICollisionBehavior alloc] init];
     self.collisionBehavior.collisionDelegate = self;
     self.collisionBehavior.translatesReferenceBoundsIntoBoundary = NO;
     [self.collisionBehavior addBoundaryWithIdentifier:@"top" fromPoint:CGPointMake(1, 1) toPoint:CGPointMake(self.view.frame.size.width - 1, 1)];
@@ -137,16 +105,119 @@
     [self.collisionBehavior addBoundaryWithIdentifier:@"right" fromPoint:CGPointMake(self.view.frame.size.width - 1, 1) toPoint:CGPointMake(self.view.frame.size.width - 1, self.view.frame.size.height - 1)];
     [self.collisionBehavior addBoundaryWithIdentifier:@"left" fromPoint:CGPointMake(1, 1) toPoint:CGPointMake(1, self.view.frame.size.height - 1)];
         [self.animator addBehavior:self.collisionBehavior];
+    
+}
 
+- (void)startGame {
+    [self.backgroundMusic stop];
+    self.ballAmount = 0;
+    [self removeMenu];
+    [self createPaddles];
+    [self startTimer];
+}
+
+- (void)easyStart:(UIButton*)sender {
+    self.ballSpeed = .10;
+    self.musicFile = [[NSBundle mainBundle] URLForResource:@"pongulator110"
+                                             withExtension:@"mp3"];
+    self.backgroundMusic = [[AVAudioPlayer alloc] initWithContentsOfURL:self.musicFile
+                                                                  error:nil];
+    self.backgroundMusic.volume = .3;
+    self.backgroundMusic.numberOfLoops = -1;
+    [self startGame];
+}
+
+- (void)mediumStart:(UIButton*)sender {
+    self.ballSpeed = .11;
+    self.musicFile = [[NSBundle mainBundle] URLForResource:@"pongulator120"
+                                             withExtension:@"mp3"];
+    self.backgroundMusic = [[AVAudioPlayer alloc] initWithContentsOfURL:self.musicFile
+                                                                  error:nil];
+    self.backgroundMusic.volume = .3;
+    self.backgroundMusic.numberOfLoops = -1;
+    [self startGame];
+}
+
+- (void)hardStart:(UIButton*)sender {
+    self.ballSpeed = .12;
+    self.musicFile = [[NSBundle mainBundle] URLForResource:@"pongulator130"
+                                             withExtension:@"mp3"];
+    self.backgroundMusic = [[AVAudioPlayer alloc] initWithContentsOfURL:self.musicFile
+                                                                  error:nil];
+    self.backgroundMusic.volume = .3;
+    self.backgroundMusic.numberOfLoops = -1;
+    [self startGame];
+}
+
+- (void)harderStart:(UIButton*)sender {
+    self.ballSpeed = .13;
+    self.musicFile = [[NSBundle mainBundle] URLForResource:@"pongulator140"
+                                             withExtension:@"mp3"];
+    self.backgroundMusic = [[AVAudioPlayer alloc] initWithContentsOfURL:self.musicFile
+                                                                  error:nil];
+    self.backgroundMusic.volume = .3;
+    self.backgroundMusic.numberOfLoops = -1;
+    [self startGame];
+}
+
+- (void)hardestStart:(UIButton*)sender {
+    self.ballSpeed = .14;
+    self.musicFile = [[NSBundle mainBundle] URLForResource:@"pongulator150"
+                                             withExtension:@"mp3"];
+    self.backgroundMusic = [[AVAudioPlayer alloc] initWithContentsOfURL:self.musicFile
+                                                                  error:nil];
+    self.backgroundMusic.volume = .3;
+    self.backgroundMusic.numberOfLoops = -1;
+    [self startGame];
+}
+
+- (void)gameRetry:(UIButton*)sender {
+//    [self.backgroundMusic stop];
+    [self.retryButton removeFromSuperview];
+    [self.menuButton removeFromSuperview];
+    [self startTimer];
+}
+
+- (void)gameMenu:(UIButton*)sender {
+    self.scoreLabel.text = @"";
+    [self removePaddles];
+    [self.retryButton removeFromSuperview];
+    [self.menuButton removeFromSuperview];
+    [self createMenu];
+}
+
+
+- (void)createPaddles {
+    CGRect leftPaddleRect = CGRectMake(10, self.view.bounds.size.height / 2 - 30, 40, 60);
+    self.leftPaddleView = [[UIView alloc] initWithFrame:leftPaddleRect];
+    self.leftPaddleView.backgroundColor = [UIColor whiteColor];
+    self.leftPaddleView.layer.cornerRadius = 5;
+    [self.view addSubview:self.leftPaddleView];
+    
+    CGRect rightPaddleRect = CGRectMake(self.view.bounds.size.width - 50, self.view.bounds.size.height / 2 - 30, 40, 60);
+    self.rightPaddleView = [[UIView alloc] initWithFrame:rightPaddleRect];
+    self.rightPaddleView.backgroundColor = [UIColor whiteColor];
+    self.rightPaddleView.layer.cornerRadius = 5;
+    [self.view addSubview:self.rightPaddleView];
+    
+    self.leftPaddleBehavior = [[UIDynamicItemBehavior alloc] initWithItems:@[self.leftPaddleView]];
+    self.leftPaddleBehavior.density = 1000;
+    self.leftPaddleBehavior.allowsRotation = NO;
+    [self.animator addBehavior:self.leftPaddleBehavior];
+    [self.collisionBehavior addItem:self.leftPaddleView];
+
+    self.rightPaddleBehavior = [[UIDynamicItemBehavior alloc] initWithItems:@[self.rightPaddleView]];
+    self.rightPaddleBehavior.density = 1000;
+    self.rightPaddleBehavior.allowsRotation = NO;
+    [self.animator addBehavior:self.rightPaddleBehavior];
+    [self.collisionBehavior addItem:self.rightPaddleView];
     
     self.leftPaddleGesture = [[UIPanGestureRecognizer alloc] initWithTarget:self action:@selector(leftPanFired:)];
     [self.leftPaddleView addGestureRecognizer:self.leftPaddleGesture];
     
     self.rightPaddleGesture = [[UIPanGestureRecognizer alloc] initWithTarget:self action:@selector(rightPanFired:)];
     [self.rightPaddleView addGestureRecognizer:self.rightPaddleGesture];
-    
 }
-
 
 - (void) leftPanFired:(UIPanGestureRecognizer *)recognizer {
         CGPoint newPaddleCenter = [recognizer locationInView:self.view];
@@ -160,6 +231,119 @@
     [self.animator updateItemUsingCurrentState:self.rightPaddleView];
 }
 
+- (void)createMenu {
+    
+    self.musicFile = [[NSBundle mainBundle] URLForResource:@"pongulatorretry"
+                                             withExtension:@"mp3"];
+    self.backgroundMusic = [[AVAudioPlayer alloc] initWithContentsOfURL:self.musicFile
+                                                                  error:nil];
+    self.backgroundMusic.volume = .1;
+    self.backgroundMusic.numberOfLoops = -1;
+    [self.backgroundMusic play];
+    
+    CGRect titleRect = CGRectMake(self.view.frame.size.width / 2 - 250, 25, 500, 75);
+    self.titleLabel = [[UILabel alloc] initWithFrame:titleRect];
+    self.titleLabel.textColor = [UIColor whiteColor];
+    self.titleLabel.textAlignment = NSTextAlignmentCenter;
+    self.titleLabel.font = [UIFont fontWithName:@"Futura" size:65];
+    self.titleLabel.text = @"PONGULATOR";
+    self.score = 0;
+    [self.view addSubview:self.titleLabel];
+
+    
+    CGRect easyRect = CGRectMake(self.view.frame.size.width / 2 - 90, self.view.frame.size.height / 2 - 60, 180, 40);
+    self.easyButton = [[UIButton alloc] initWithFrame:easyRect];
+    [self.easyButton addTarget:self
+                        action:@selector(easyStart:)
+              forControlEvents:UIControlEventTouchUpInside];
+//    [self.easyButton setBackgroundColor:[UIColor colorWithWhite:1 alpha:.5]];
+//    [self.easyButton setTitleColor:[UIColor blackColor] forState:UIControlStateNormal];
+    [self.easyButton setTitle:@"EASY" forState:UIControlStateNormal];
+    self.easyButton.titleLabel.font = [UIFont fontWithName:@"Futura" size:40];
+    [self.view addSubview:self.easyButton];
+    
+    CGRect mediumRect = CGRectMake(self.view.frame.size.width / 2 - 90, self.view.frame.size.height / 2 - 20, 180, 40);
+    self.mediumButton = [[UIButton alloc] initWithFrame:mediumRect];
+    [self.mediumButton addTarget:self
+                          action:@selector(mediumStart:)
+                forControlEvents:UIControlEventTouchUpInside];
+//    [self.mediumButton setBackgroundColor:[UIColor whiteColor]];
+//    [self.mediumButton setTitleColor:[UIColor blackColor] forState:UIControlStateNormal];
+    [self.mediumButton setTitle:@"MEDIUM" forState:UIControlStateNormal];
+    self.mediumButton.titleLabel.font = [UIFont fontWithName:@"Futura" size:40];
+    [self.view addSubview:self.mediumButton];
+    
+    CGRect hardRect = CGRectMake(self.view.frame.size.width / 2 - 90, self.view.frame.size.height / 2 + 20, 180, 40);
+    self.hardButton = [[UIButton alloc] initWithFrame:hardRect];
+    [self.hardButton addTarget:self
+                        action:@selector(hardStart:)
+              forControlEvents:UIControlEventTouchUpInside];
+//    [self.hardButton setBackgroundColor:[UIColor whiteColor]];
+//    [self.hardButton setTitleColor:[UIColor blackColor] forState:UIControlStateNormal];
+    [self.hardButton setTitle:@"HARD" forState:UIControlStateNormal];
+    self.hardButton.titleLabel.font = [UIFont fontWithName:@"Futura" size:40];
+    [self.view addSubview:self.hardButton];
+    
+    CGRect harderRect = CGRectMake(self.view.frame.size.width / 2 - 90, self.view.frame.size.height / 2 + 60, 180, 40);
+    self.harderButton = [[UIButton alloc] initWithFrame:harderRect];
+    [self.harderButton addTarget:self
+                          action:@selector(harderStart:)
+                forControlEvents:UIControlEventTouchUpInside];
+//    [self.harderButton setBackgroundColor:[UIColor whiteColor]];
+//    [self.harderButton setTitleColor:[UIColor blackColor] forState:UIControlStateNormal];
+    [self.harderButton setTitle:@"HARDER" forState:UIControlStateNormal];
+    self.harderButton.titleLabel.font = [UIFont fontWithName:@"Futura" size:40];
+    [self.view addSubview:self.harderButton];
+    
+    CGRect hardestRect = CGRectMake(self.view.frame.size.width / 2 - 90, self.view.frame.size.height / 2 + 100, 180, 40);
+    self.hardestButton = [[UIButton alloc] initWithFrame:hardestRect];
+    [self.hardestButton addTarget:self
+                           action:@selector(hardestStart:)
+                 forControlEvents:UIControlEventTouchUpInside];
+//    [self.hardestButton setBackgroundColor:[UIColor whiteColor]];
+//    [self.hardestButton setTitleColor:[UIColor blackColor] forState:UIControlStateNormal];
+    [self.hardestButton setTitle:@"HARDEST" forState:UIControlStateNormal];
+    self.hardestButton.titleLabel.font = [UIFont fontWithName:@"Futura" size:40];
+    [self.view addSubview:self.hardestButton];
+}
+
+-(void)removeMenu {
+    [self.titleLabel removeFromSuperview];
+    [self.easyButton removeFromSuperview];
+    [self.mediumButton removeFromSuperview];
+    [self.hardButton removeFromSuperview];
+    [self.harderButton removeFromSuperview];
+    [self.hardestButton removeFromSuperview];
+}
+
+- (void)retryMenu {
+//    self.musicFile = [[NSBundle mainBundle] URLForResource:@"pongulatormenu"
+//                                             withExtension:@"mp3"];
+//    self.backgroundMusic = [[AVAudioPlayer alloc] initWithContentsOfURL:self.musicFile
+//                                                                  error:nil];
+//    self.backgroundMusic.volume = .3;
+//    self.backgroundMusic.numberOfLoops = -1;
+//    [self.backgroundMusic play];
+
+    CGRect retryRect = CGRectMake(self.view.frame.size.width / 2 - 100, self.view.frame.size.height / 2 - 40, 200, 80);
+    self.retryButton = [[UIButton alloc] initWithFrame:retryRect];
+    [self.retryButton addTarget:self
+                        action:@selector(gameRetry:)
+              forControlEvents:UIControlEventTouchUpInside];
+    [self.retryButton setTitle:@"RETRY" forState:UIControlStateNormal];
+    self.retryButton.titleLabel.font = [UIFont fontWithName:@"Futura" size:60];
+    [self.view addSubview:self.retryButton];
+
+    CGRect menuRect = CGRectMake(self.view.frame.size.width / 2 - 150, self.view.frame.size.height / 2 + 40, 300, 40);
+    self.menuButton = [[UIButton alloc] initWithFrame:menuRect];
+    [self.menuButton addTarget:self
+                        action:@selector(gameMenu:)
+              forControlEvents:UIControlEventTouchUpInside];
+    [self.menuButton setTitle:@"MAIN MENU" forState:UIControlStateNormal];
+    self.menuButton.titleLabel.font = [UIFont fontWithName:@"Futura" size:40];
+    [self.view addSubview:self.menuButton];
+
+}
 
 - (void)createBall {
     CGRect ballRect = CGRectMake(self.view.bounds.size.width / 2, self.view.bounds.size.height / 2, 16, 16);
@@ -178,7 +362,6 @@
     self.isBall = YES;
     
     [self.collisionBehavior addItem:self.ballView];
-    
 }
 
 - (void)createExtraBall {
@@ -198,7 +381,6 @@
     self.isExtraBall = YES;
     
     [self.collisionBehavior addItem:self.extraBallView];
-    
 }
 
 - (void)createThirdBall {
@@ -218,9 +400,16 @@
     self.isThirdBall = YES;
     
     [self.collisionBehavior addItem:self.thirdBallView];
-    
 }
 
+- (void)removePaddles {
+    [self.animator removeBehavior:self.leftPaddleBehavior];
+    [self.animator removeBehavior:self.rightPaddleBehavior];
+    [self.collisionBehavior removeItem:self.leftPaddleView];
+    [self.collisionBehavior removeItem:self.rightPaddleView];
+    [self.leftPaddleView removeFromSuperview];
+    [self.rightPaddleView removeFromSuperview];
+}
 
 - (void)removeBall {
     [self.animator removeBehavior:self.ballBehavior];
@@ -276,14 +465,12 @@
     [self.animator addBehavior:self.thirdPushBehavior];
 }
 
-
-
 - (void) startTimer {
     self.count = 4;
     [NSTimer scheduledTimerWithTimeInterval:.5 target:self selector:@selector(countdownTimer:) userInfo:nil repeats:YES];
 }
 
--(void) countdownTimer:(NSTimer*)timer{
+-(void) countdownTimer:(NSTimer*)timer {
 
     self.count--;
     self.countLabel.text = [NSString stringWithFormat:@"%ld", (long)self.count];
@@ -292,6 +479,7 @@
         if (self.count == 0) {
             self.countLabel.text = @"";
             [timer invalidate];
+            [self.backgroundMusic play];
             [self createBall];
             [self pushBall];
     }
@@ -304,160 +492,82 @@
         if (item == self.ballView) {
             [self removeBall];
             if (self.ballAmount == 0) {
-                [self startTimer];
-                
+                [self.backgroundMusic stop];
+                self.backgroundMusic.currentTime = 0;
+                [self retryMenu];
             }
         }
         if (item == self.extraBallView) {
             [self removeExtraBall];
             if (self.ballAmount == 0) {
-                [self startTimer];
-                
+                [self.backgroundMusic stop];
+                self.backgroundMusic.currentTime = 0;
+                [self retryMenu];
             }
         }
         if (item == self.thirdBallView) {
             [self removeThirdBall];
             if (self.ballAmount == 0) {
-                [self startTimer];
-                
+                [self.backgroundMusic stop];
+                self.backgroundMusic.currentTime = 0;
+                [self retryMenu];
             }
         }
-
     }
 }
 
--(void)collisionBehavior:(UICollisionBehavior *)behavior beganContactForItem:(id)item1 withItem:(id)item2 atPoint:(CGPoint)p{
+- (void) ballHitPaddle {
+    [self bgChange];
+    self.score++;
+    self.scoreLabel.text = [NSString stringWithFormat:@"%ld", (long)self.score];
+    if (self.score % 10 == 0) {
+        if (self.isBall == NO) {
+            [self createBall];
+            [self pushBall];
+        }
+        else if (self.isExtraBall == NO) {
+            [self createExtraBall];
+            [self pushExtraBall];
+        }
+        else if (self.isThirdBall == NO) {
+            [self createThirdBall];
+            [self pushThirdBall];
+        }
+    }
+}
+
+- (void)collisionBehavior:(UICollisionBehavior *)behavior beganContactForItem:(id)item1 withItem:(id)item2 atPoint:(CGPoint)p {
     
     if ((item1 == self.ballView || item2 == self.ballView) && (item1 == self.leftPaddleView || item2 == self.leftPaddleView)) {
         if (p.x > self.leftPaddleView.frame.origin.x + self.leftPaddleView.frame.size.width) {
-            [self bgChange];
-            self.score++;
-            self.scoreLabel.text = [NSString stringWithFormat:@"%ld", (long)self.score];
-            if (self.score % 10 == 0) {
-                if (self.isBall == NO) {
-                    [self createBall];
-                    [self pushBall];
-                }
-                else if (self.isExtraBall == NO) {
-                    [self createExtraBall];
-                    [self pushExtraBall];
-                }
-                else if (self.isThirdBall == NO) {
-                    [self createThirdBall];
-                    [self pushThirdBall];
-                }
-            }
+            [self ballHitPaddle];
         }
     }
     else if ((item1 == self.ballView || item2 == self.ballView) && (item1 == self.rightPaddleView || item2 == self.rightPaddleView)) {
         if (p.x < self.rightPaddleView.frame.origin.x) {
-            [self bgChange];
-            self.score++;
-            self.scoreLabel.text = [NSString stringWithFormat:@"%ld", (long)self.score];
-            if (self.score % 10 == 0) {
-                if (self.isBall == NO) {
-                    [self createBall];
-                    [self pushBall];
-                }
-                else if (self.isExtraBall == NO) {
-                    [self createExtraBall];
-                    [self pushExtraBall];
-                }
-                else if (self.isThirdBall == NO) {
-                    [self createThirdBall];
-                    [self pushThirdBall];
-                }
-            }
-            
+            [self ballHitPaddle];
         }
     }
     else if ((item1 == self.extraBallView || item2 == self.extraBallView) && (item1 == self.leftPaddleView || item2 == self.leftPaddleView)) {
         if (p.x > self.leftPaddleView.frame.origin.x + self.leftPaddleView.frame.size.width) {
-            [self bgChange];
-            self.score++;
-            self.scoreLabel.text = [NSString stringWithFormat:@"%ld", (long)self.score];
-            if (self.score % 10 == 0) {
-                if (self.isBall == NO) {
-                    [self createBall];
-                    [self pushBall];
-                }
-                else if (self.isExtraBall == NO) {
-                    [self createExtraBall];
-                    [self pushExtraBall];
-                }
-                else if (self.isThirdBall == NO) {
-                    [self createThirdBall];
-                    [self pushThirdBall];
-                }
-            }
-            
+            [self ballHitPaddle];
         }
     }
     else if ((item1 == self.extraBallView || item2 == self.extraBallView) && (item1 == self.rightPaddleView || item2 == self.rightPaddleView)) {
         if (p.x < self.rightPaddleView.frame.origin.x) {
-            [self bgChange];
-            self.score++;
-            self.scoreLabel.text = [NSString stringWithFormat:@"%ld", (long)self.score];
-            if (self.score % 10 == 0) {
-                if (self.isBall == NO) {
-                    [self createBall];
-                    [self pushBall];
-                }
-                else if (self.isExtraBall == NO) {
-                    [self createExtraBall];
-                    [self pushExtraBall];
-                }
-                else if (self.isThirdBall == NO) {
-                    [self createThirdBall];
-                    [self pushThirdBall];
-                }
-            }
-            
+            [self ballHitPaddle];
         }
     }
     else if ((item1 == self.thirdBallView || item2 == self.thirdBallView) && (item1 == self.leftPaddleView || item2 == self.leftPaddleView)) {
         if (p.x > self.leftPaddleView.frame.origin.x + self.leftPaddleView.frame.size.width) {
-            [self bgChange];
-            self.score++;
-            self.scoreLabel.text = [NSString stringWithFormat:@"%ld", (long)self.score];
-            if (self.score % 10 == 0) {
-                if (self.isBall == NO) {
-                    [self createBall];
-                    [self pushBall];
-                }
-                else if (self.isExtraBall == NO) {
-                    [self createExtraBall];
-                    [self pushExtraBall];
-                }
-                else if (self.isThirdBall == NO) {
-                    [self createThirdBall];
-                    [self pushThirdBall];
-                }
-            }
+            [self ballHitPaddle];
         }
     }
     else if ((item1 == self.thirdBallView || item2 == self.thirdBallView) && (item1 == self.rightPaddleView || item2 == self.rightPaddleView)) {
         if (p.x < self.rightPaddleView.frame.origin.x) {
-            [self bgChange];
-            self.score++;
-            self.scoreLabel.text = [NSString stringWithFormat:@"%ld", (long)self.score];
-            if (self.score % 10 == 0) {
-                if (self.isBall == NO) {
-                    [self createBall];
-                    [self pushBall];
-                }
-                else if (self.isExtraBall == NO) {
-                    [self createExtraBall];
-                    [self pushExtraBall];
-                }
-                else if (self.isThirdBall == NO) {
-                    [self createThirdBall];
-                    [self pushThirdBall];
-                }
-            }
+            [self ballHitPaddle];
         }
     }
-    
 }
 
 - (void)bgChange {
@@ -466,8 +576,7 @@
     self.bgTimer = [NSTimer scheduledTimerWithTimeInterval:.95f target:self selector:@selector(bgChangeBack) userInfo:nil repeats:NO];
 }
 
-- (void)bgChangeBack
-{
+- (void)bgChangeBack {
     self.bgView.image = [UIImage animatedImageNamed:@"pong-" duration:.75f];
     [self.bgTimer invalidate];
 }
