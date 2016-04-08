@@ -23,6 +23,11 @@
 		82AD423E1CB6BE3100590DBF /* pongulator110.mp3 in Resources */ = {isa = PBXBuildFile; fileRef = 82AD42391CB6BE3100590DBF /* pongulator110.mp3 */; };
 		82AD42411CB6F92D00590DBF /* pongulatorretry.mp3 in Resources */ = {isa = PBXBuildFile; fileRef = 82AD423F1CB6F92C00590DBF /* pongulatorretry.mp3 */; };
 		82AD42421CB6F92D00590DBF /* pongulatormenu.mp3 in Resources */ = {isa = PBXBuildFile; fileRef = 82AD42401CB6F92C00590DBF /* pongulatormenu.mp3 */; };
+		82EAEBE71CB807A400E01E96 /* pongulatorspeech.mp3 in Resources */ = {isa = PBXBuildFile; fileRef = 82EAEBE61CB807A400E01E96 /* pongulatorspeech.mp3 */; };
+		82EAEBE91CB80F3C00E01E96 /* pongulatorend.mp3 in Resources */ = {isa = PBXBuildFile; fileRef = 82EAEBE81CB80F3C00E01E96 /* pongulatorend.mp3 */; };
+		82EAEBED1CB811FF00E01E96 /* pong3.mp3 in Resources */ = {isa = PBXBuildFile; fileRef = 82EAEBEA1CB811FF00E01E96 /* pong3.mp3 */; };
+		82EAEBEE1CB811FF00E01E96 /* pong2.mp3 in Resources */ = {isa = PBXBuildFile; fileRef = 82EAEBEB1CB811FF00E01E96 /* pong2.mp3 */; };
+		82EAEBEF1CB811FF00E01E96 /* pong1.mp3 in Resources */ = {isa = PBXBuildFile; fileRef = 82EAEBEC1CB811FF00E01E96 /* pong1.mp3 */; };
 /* End PBXBuildFile section */
 
 /* Begin PBXContainerItemProxy section */
@@ -67,6 +72,11 @@
 		82AD42391CB6BE3100590DBF /* pongulator110.mp3 */ = {isa = PBXFileReference; lastKnownFileType = audio.mp3; name = pongulator110.mp3; path = ../../../../Documents/pongulator110.mp3; sourceTree = "<group>"; };
 		82AD423F1CB6F92C00590DBF /* pongulatorretry.mp3 */ = {isa = PBXFileReference; lastKnownFileType = audio.mp3; name = pongulatorretry.mp3; path = ../../../../Documents/pongulatorretry.mp3; sourceTree = "<group>"; };
 		82AD42401CB6F92C00590DBF /* pongulatormenu.mp3 */ = {isa = PBXFileReference; lastKnownFileType = audio.mp3; name = pongulatormenu.mp3; path = ../../../../Documents/pongulatormenu.mp3; sourceTree = "<group>"; };
+		82EAEBE61CB807A400E01E96 /* pongulatorspeech.mp3 */ = {isa = PBXFileReference; lastKnownFileType = audio.mp3; name = pongulatorspeech.mp3; path = ../../../../Documents/pongulatorspeech.mp3; sourceTree = "<group>"; };
+		82EAEBE81CB80F3C00E01E96 /* pongulatorend.mp3 */ = {isa = PBXFileReference; lastKnownFileType = audio.mp3; name = pongulatorend.mp3; path = ../../../../Documents/pongulatorend.mp3; sourceTree = "<group>"; };
+		82EAEBEA1CB811FF00E01E96 /* pong3.mp3 */ = {isa = PBXFileReference; lastKnownFileType = audio.mp3; name = pong3.mp3; path = ../../../../Documents/pong3.mp3; sourceTree = "<group>"; };
+		82EAEBEB1CB811FF00E01E96 /* pong2.mp3 */ = {isa = PBXFileReference; lastKnownFileType = audio.mp3; name = pong2.mp3; path = ../../../../Documents/pong2.mp3; sourceTree = "<group>"; };
+		82EAEBEC1CB811FF00E01E96 /* pong1.mp3 */ = {isa = PBXFileReference; lastKnownFileType = audio.mp3; name = pong1.mp3; path = ../../../../Documents/pong1.mp3; sourceTree = "<group>"; };
 /* End PBXFileReference section */
 
 /* Begin PBXFrameworksBuildPhase section */
@@ -131,6 +141,11 @@
 				82AD42371CB6BE3100590DBF /* pongulator130.mp3 */,
 				82AD42381CB6BE3100590DBF /* pongulator120.mp3 */,
 				82AD42391CB6BE3100590DBF /* pongulator110.mp3 */,
+				82EAEBE61CB807A400E01E96 /* pongulatorspeech.mp3 */,
+				82EAEBE81CB80F3C00E01E96 /* pongulatorend.mp3 */,
+				82EAEBEA1CB811FF00E01E96 /* pong3.mp3 */,
+				82EAEBEB1CB811FF00E01E96 /* pong2.mp3 */,
+				82EAEBEC1CB811FF00E01E96 /* pong1.mp3 */,
 				824B84D11C9727290009C182 /* Assets.xcassets */,
 				824B84D31C9727290009C182 /* LaunchScreen.storyboard */,
 				824B84D61C9727290009C182 /* Info.plist */,
@@ -270,12 +285,17 @@
 			buildActionMask = 2147483647;
 			files = (
 				82AD423A1CB6BE3100590DBF /* pongulator150.mp3 in Resources */,
+				82EAEBEE1CB811FF00E01E96 /* pong2.mp3 in Resources */,
 				82AD42411CB6F92D00590DBF /* pongulatorretry.mp3 in Resources */,
+				82EAEBED1CB811FF00E01E96 /* pong3.mp3 in Resources */,
 				82AD423B1CB6BE3100590DBF /* pongulator140.mp3 in Resources */,
+				82EAEBE71CB807A400E01E96 /* pongulatorspeech.mp3 in Resources */,
 				824B84D51C9727290009C182 /* LaunchScreen.storyboard in Resources */,
+				82EAEBE91CB80F3C00E01E96 /* pongulatorend.mp3 in Resources */,
 				82AD42421CB6F92D00590DBF /* pongulatormenu.mp3 in Resources */,
 				82AD423D1CB6BE3100590DBF /* pongulator120.mp3 in Resources */,
 				82AD423E1CB6BE3100590DBF /* pongulator110.mp3 in Resources */,
+				82EAEBEF1CB811FF00E01E96 /* pong1.mp3 in Resources */,
 				824B84D21C9727290009C182 /* Assets.xcassets in Resources */,
 				82AD423C1CB6BE3100590DBF /* pongulator130.mp3 in Resources */,
 				824B84D01C9727290009C182 /* Main.storyboard in Resources */,

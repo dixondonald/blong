@@ -38,6 +38,16 @@
 @property (nonatomic) float ballSpeed;
 
 @property(nonatomic, strong) AVAudioPlayer *backgroundMusic;
+@property (nonatomic, strong) NSURL *musicFile;
+
+@property(nonatomic, strong) AVAudioPlayer *titleSpeech;
+@property (nonatomic, strong) NSURL *speechFile;
+
+@property(nonatomic, strong) AVAudioPlayer *endSound;
+@property (nonatomic, strong) NSURL *soundFile;
+
+@property(nonatomic, strong) AVAudioPlayer *countSpeech;
+@property (nonatomic, strong) NSURL *countFile;
 
 @property (nonatomic, strong) UILabel *countLabel;
 @property (nonatomic, strong) UILabel *scoreLabel;
@@ -50,7 +60,6 @@
 @property (nonatomic, strong) UIButton *harderButton;
 @property (nonatomic, strong) UIButton *hardestButton;
 
-@property (nonatomic, strong) NSURL *musicFile;
 
 @property BOOL isBall;
 @property BOOL isExtraBall;
@@ -86,14 +95,14 @@
     self.countLabel = [[UILabel alloc] initWithFrame:countRect];
     self.countLabel.textColor = [UIColor whiteColor];
     self.countLabel.textAlignment = NSTextAlignmentCenter;
-    self.countLabel.font = [UIFont fontWithName:@"Futura" size:50];
+    self.countLabel.font = [UIFont fontWithName:@"HelveticaNeue-UltraLight" size:50];
     [self.view addSubview:self.countLabel];
 
     CGRect scoreRect = CGRectMake(self.view.frame.size.width / 2 - 25, 10, 50, 40);
     self.scoreLabel = [[UILabel alloc] initWithFrame:scoreRect];
     self.scoreLabel.textColor = [UIColor whiteColor];
     self.scoreLabel.textAlignment = NSTextAlignmentCenter;
-    self.scoreLabel.font = [UIFont fontWithName:@"Futura" size:40];
+    self.scoreLabel.font = [UIFont fontWithName:@"HelveticaNeue-UltraLight" size:40];
     self.score = 0;
     [self.view addSubview:self.scoreLabel];
 
@@ -128,7 +137,7 @@
 }
 
 - (void)mediumStart:(UIButton*)sender {
-    self.ballSpeed = .11;
+    self.ballSpeed = .12;
     self.musicFile = [[NSBundle mainBundle] URLForResource:@"pongulator120"
                                              withExtension:@"mp3"];
     self.backgroundMusic = [[AVAudioPlayer alloc] initWithContentsOfURL:self.musicFile
@@ -139,7 +148,7 @@
 }
 
 - (void)hardStart:(UIButton*)sender {
-    self.ballSpeed = .12;
+    self.ballSpeed = .14;
     self.musicFile = [[NSBundle mainBundle] URLForResource:@"pongulator130"
                                              withExtension:@"mp3"];
     self.backgroundMusic = [[AVAudioPlayer alloc] initWithContentsOfURL:self.musicFile
@@ -150,7 +159,7 @@
 }
 
 - (void)harderStart:(UIButton*)sender {
-    self.ballSpeed = .13;
+    self.ballSpeed = .16;
     self.musicFile = [[NSBundle mainBundle] URLForResource:@"pongulator140"
                                              withExtension:@"mp3"];
     self.backgroundMusic = [[AVAudioPlayer alloc] initWithContentsOfURL:self.musicFile
@@ -161,7 +170,7 @@
 }
 
 - (void)hardestStart:(UIButton*)sender {
-    self.ballSpeed = .14;
+    self.ballSpeed = .18;
     self.musicFile = [[NSBundle mainBundle] URLForResource:@"pongulator150"
                                              withExtension:@"mp3"];
     self.backgroundMusic = [[AVAudioPlayer alloc] initWithContentsOfURL:self.musicFile
@@ -188,16 +197,18 @@
 
 
 - (void)createPaddles {
-    CGRect leftPaddleRect = CGRectMake(10, self.view.bounds.size.height / 2 - 30, 40, 60);
+    CGRect leftPaddleRect = CGRectMake(5, self.view.bounds.size.height / 2 - 30, 40, 60);
     self.leftPaddleView = [[UIView alloc] initWithFrame:leftPaddleRect];
     self.leftPaddleView.backgroundColor = [UIColor whiteColor];
-    self.leftPaddleView.layer.cornerRadius = 5;
+    [self.leftPaddleView setAlpha:0.85];
+    self.leftPaddleView.layer.cornerRadius = 2;
     [self.view addSubview:self.leftPaddleView];
     
-    CGRect rightPaddleRect = CGRectMake(self.view.bounds.size.width - 50, self.view.bounds.size.height / 2 - 30, 40, 60);
+    CGRect rightPaddleRect = CGRectMake(self.view.bounds.size.width - 45, self.view.bounds.size.height / 2 - 30, 40, 60);
     self.rightPaddleView = [[UIView alloc] initWithFrame:rightPaddleRect];
     self.rightPaddleView.backgroundColor = [UIColor whiteColor];
-    self.rightPaddleView.layer.cornerRadius = 5;
+    [self.rightPaddleView setAlpha:0.85];
+    self.rightPaddleView.layer.cornerRadius = 2;
     [self.view addSubview:self.rightPaddleView];
     
     self.leftPaddleBehavior = [[UIDynamicItemBehavior alloc] initWithItems:@[self.leftPaddleView]];
@@ -233,17 +244,32 @@
 
 - (void)createMenu {
     
-    self.musicFile = [[NSBundle mainBundle] URLForResource:@"pongulatorretry"
+    self.speechFile = [[NSBundle mainBundle] URLForResource:@"pongulatorspeech"
+                                             withExtension:@"mp3"];
+    self.titleSpeech = [[AVAudioPlayer alloc] initWithContentsOfURL:self.speechFile
+                                                                        error:nil];
+    self.titleSpeech.volume = .5;
+    self.titleSpeech.numberOfLoops = 0;
+    [self.titleSpeech play];
+    
+    
+    double delayInSeconds = .6;
+    dispatch_time_t popTime = dispatch_time(DISPATCH_TIME_NOW, (int64_t)(delayInSeconds * NSEC_PER_SEC));
+    dispatch_after(popTime, dispatch_get_main_queue(), ^(void){
+    
+    self.musicFile = [[NSBundle mainBundle] URLForResource:@"pongulatormenu"
                                              withExtension:@"mp3"];
     self.backgroundMusic = [[AVAudioPlayer alloc] initWithContentsOfURL:self.musicFile
                                                                   error:nil];
-    self.backgroundMusic.volume = .1;
+    self.backgroundMusic.volume = .3;
     self.backgroundMusic.numberOfLoops = -1;
     [self.backgroundMusic play];
+        
+    });
     
-    CGRect titleRect = CGRectMake(self.view.frame.size.width / 2 - 250, 25, 500, 75);
+    CGRect titleRect = CGRectMake(self.view.frame.size.width / 2 - 250, 10, 500, 75);
     self.titleLabel = [[UILabel alloc] initWithFrame:titleRect];
-    self.titleLabel.textColor = [UIColor whiteColor];
+    self.titleLabel.textColor = [UIColor colorWithRed:(255/255.0) green:(255/255.0) blue:(255/255.0) alpha:.90];
     self.titleLabel.textAlignment = NSTextAlignmentCenter;
     self.titleLabel.font = [UIFont fontWithName:@"Futura" size:65];
     self.titleLabel.text = @"PONGULATOR";
@@ -251,26 +277,28 @@
     [self.view addSubview:self.titleLabel];
 
     
-    CGRect easyRect = CGRectMake(self.view.frame.size.width / 2 - 90, self.view.frame.size.height / 2 - 60, 180, 40);
+    CGRect easyRect = CGRectMake(self.view.frame.size.width / 2 - 90, self.view.frame.size.height / 2 - 80, 180, 40);
     self.easyButton = [[UIButton alloc] initWithFrame:easyRect];
     [self.easyButton addTarget:self
                         action:@selector(easyStart:)
               forControlEvents:UIControlEventTouchUpInside];
 //    [self.easyButton setBackgroundColor:[UIColor colorWithWhite:1 alpha:.5]];
 //    [self.easyButton setTitleColor:[UIColor blackColor] forState:UIControlStateNormal];
+    [self.easyButton.titleLabel setTextAlignment:NSTextAlignmentCenter];
     [self.easyButton setTitle:@"EASY" forState:UIControlStateNormal];
-    self.easyButton.titleLabel.font = [UIFont fontWithName:@"Futura" size:40];
+    self.easyButton.titleLabel.font = [UIFont fontWithName:@"HelveticaNeue-UltraLight" size:40];
     [self.view addSubview:self.easyButton];
     
-    CGRect mediumRect = CGRectMake(self.view.frame.size.width / 2 - 90, self.view.frame.size.height / 2 - 20, 180, 40);
+    CGRect mediumRect = CGRectMake(self.view.frame.size.width / 2 - 90, self.view.frame.size.height / 2 - 30, 180, 40);
     self.mediumButton = [[UIButton alloc] initWithFrame:mediumRect];
     [self.mediumButton addTarget:self
                           action:@selector(mediumStart:)
                 forControlEvents:UIControlEventTouchUpInside];
 //    [self.mediumButton setBackgroundColor:[UIColor whiteColor]];
 //    [self.mediumButton setTitleColor:[UIColor blackColor] forState:UIControlStateNormal];
+    [self.mediumButton.titleLabel setTextAlignment:NSTextAlignmentCenter];
     [self.mediumButton setTitle:@"MEDIUM" forState:UIControlStateNormal];
-    self.mediumButton.titleLabel.font = [UIFont fontWithName:@"Futura" size:40];
+    self.mediumButton.titleLabel.font = [UIFont fontWithName:@"HelveticaNeue-UltraLight" size:40];
     [self.view addSubview:self.mediumButton];
     
     CGRect hardRect = CGRectMake(self.view.frame.size.width / 2 - 90, self.view.frame.size.height / 2 + 20, 180, 40);
@@ -280,30 +308,33 @@
               forControlEvents:UIControlEventTouchUpInside];
 //    [self.hardButton setBackgroundColor:[UIColor whiteColor]];
 //    [self.hardButton setTitleColor:[UIColor blackColor] forState:UIControlStateNormal];
+    [self.hardButton.titleLabel setTextAlignment:NSTextAlignmentCenter];
     [self.hardButton setTitle:@"HARD" forState:UIControlStateNormal];
-    self.hardButton.titleLabel.font = [UIFont fontWithName:@"Futura" size:40];
+    self.hardButton.titleLabel.font = [UIFont fontWithName:@"HelveticaNeue-UltraLight" size:40];
     [self.view addSubview:self.hardButton];
     
-    CGRect harderRect = CGRectMake(self.view.frame.size.width / 2 - 90, self.view.frame.size.height / 2 + 60, 180, 40);
+    CGRect harderRect = CGRectMake(self.view.frame.size.width / 2 - 90, self.view.frame.size.height / 2 + 70, 180, 40);
     self.harderButton = [[UIButton alloc] initWithFrame:harderRect];
     [self.harderButton addTarget:self
                           action:@selector(harderStart:)
                 forControlEvents:UIControlEventTouchUpInside];
 //    [self.harderButton setBackgroundColor:[UIColor whiteColor]];
-//    [self.harderButton setTitleColor:[UIColor blackColor] forState:UIControlStateNormal];
+//    [self.harderButton setTitleColor:[UIColor redColor] forState:UIControlStateNormal];
+    [self.harderButton.titleLabel setTextAlignment:NSTextAlignmentCenter];
     [self.harderButton setTitle:@"HARDER" forState:UIControlStateNormal];
-    self.harderButton.titleLabel.font = [UIFont fontWithName:@"Futura" size:40];
+    self.harderButton.titleLabel.font = [UIFont fontWithName:@"HelveticaNeue-UltraLight" size:40];
     [self.view addSubview:self.harderButton];
     
-    CGRect hardestRect = CGRectMake(self.view.frame.size.width / 2 - 90, self.view.frame.size.height / 2 + 100, 180, 40);
+    CGRect hardestRect = CGRectMake(self.view.frame.size.width / 2 - 100, self.view.frame.size.height / 2 + 120, 200, 40);
     self.hardestButton = [[UIButton alloc] initWithFrame:hardestRect];
     [self.hardestButton addTarget:self
                            action:@selector(hardestStart:)
                  forControlEvents:UIControlEventTouchUpInside];
 //    [self.hardestButton setBackgroundColor:[UIColor whiteColor]];
 //    [self.hardestButton setTitleColor:[UIColor blackColor] forState:UIControlStateNormal];
+    [self.hardestButton.titleLabel setTextAlignment:NSTextAlignmentCenter];
     [self.hardestButton setTitle:@"HARDEST" forState:UIControlStateNormal];
-    self.hardestButton.titleLabel.font = [UIFont fontWithName:@"Futura" size:40];
+    self.hardestButton.titleLabel.font = [UIFont fontWithName:@"HelveticaNeue-UltraLight" size:40];
     [self.view addSubview:self.hardestButton];
 }
 
@@ -317,30 +348,23 @@
 }
 
 - (void)retryMenu {
-//    self.musicFile = [[NSBundle mainBundle] URLForResource:@"pongulatormenu"
-//                                             withExtension:@"mp3"];
-//    self.backgroundMusic = [[AVAudioPlayer alloc] initWithContentsOfURL:self.musicFile
-//                                                                  error:nil];
-//    self.backgroundMusic.volume = .3;
-//    self.backgroundMusic.numberOfLoops = -1;
-//    [self.backgroundMusic play];
 
-    CGRect retryRect = CGRectMake(self.view.frame.size.width / 2 - 100, self.view.frame.size.height / 2 - 40, 200, 80);
+    CGRect retryRect = CGRectMake(self.view.frame.size.width / 2 - 125, self.view.frame.size.height / 2 - 60, 250, 80);
     self.retryButton = [[UIButton alloc] initWithFrame:retryRect];
     [self.retryButton addTarget:self
                         action:@selector(gameRetry:)
               forControlEvents:UIControlEventTouchUpInside];
     [self.retryButton setTitle:@"RETRY" forState:UIControlStateNormal];
-    self.retryButton.titleLabel.font = [UIFont fontWithName:@"Futura" size:60];
+    self.retryButton.titleLabel.font = [UIFont fontWithName:@"HelveticaNeue-UltraLight" size:60];
     [self.view addSubview:self.retryButton];
 
-    CGRect menuRect = CGRectMake(self.view.frame.size.width / 2 - 150, self.view.frame.size.height / 2 + 40, 300, 40);
+    CGRect menuRect = CGRectMake(self.view.frame.size.width / 2 - 150, self.view.frame.size.height / 2 + 20, 300, 40);
     self.menuButton = [[UIButton alloc] initWithFrame:menuRect];
     [self.menuButton addTarget:self
                         action:@selector(gameMenu:)
               forControlEvents:UIControlEventTouchUpInside];
     [self.menuButton setTitle:@"MAIN MENU" forState:UIControlStateNormal];
-    self.menuButton.titleLabel.font = [UIFont fontWithName:@"Futura" size:40];
+    self.menuButton.titleLabel.font = [UIFont fontWithName:@"HelveticaNeue-UltraLight" size:40];
     [self.view addSubview:self.menuButton];
 
 }
@@ -467,16 +491,47 @@
 
 - (void) startTimer {
     self.count = 4;
-    [NSTimer scheduledTimerWithTimeInterval:.5 target:self selector:@selector(countdownTimer:) userInfo:nil repeats:YES];
+    [NSTimer scheduledTimerWithTimeInterval:.4 target:self selector:@selector(countdownTimer:) userInfo:nil repeats:YES];
 }
 
 -(void) countdownTimer:(NSTimer*)timer {
 
     self.count--;
     self.countLabel.text = [NSString stringWithFormat:@"%ld", (long)self.count];
+
     self.score = 0;
     self.scoreLabel.text = [NSString stringWithFormat:@"%ld", (long)self.score];
-        if (self.count == 0) {
+    
+    if (self.count == 3) {
+        self.countFile = [[NSBundle mainBundle] URLForResource:@"pong3"
+                                                 withExtension:@"mp3"];
+        self.countSpeech = [[AVAudioPlayer alloc] initWithContentsOfURL:self.countFile
+                                                                      error:nil];
+        self.countSpeech.volume = .3;
+        self.countSpeech.numberOfLoops = 0;
+        [self.countSpeech play];
+    }
+    if (self.count == 2) {
+        self.countFile = [[NSBundle mainBundle] URLForResource:@"pong2"
+                                             withExtension:@"mp3"];
+        self.countSpeech = [[AVAudioPlayer alloc] initWithContentsOfURL:self.countFile
+                                                                      error:nil];
+        self.countSpeech.volume = .3;
+        self.countSpeech.numberOfLoops = 0;
+        [self.countSpeech play];
+    }
+    if (self.count == 1) {
+        self.countFile = [[NSBundle mainBundle] URLForResource:@"pong1"
+                                                 withExtension:@"mp3"];
+        self.countSpeech = [[AVAudioPlayer alloc] initWithContentsOfURL:self.countFile
+                                                                      error:nil];
+        self.countSpeech.volume = .3;
+        self.countSpeech.numberOfLoops = 0;
+        [self.countSpeech play];
+    }
+   
+    
+    if (self.count == 0) {
             self.countLabel.text = @"";
             [timer invalidate];
             [self.backgroundMusic play];
@@ -492,6 +547,13 @@
         if (item == self.ballView) {
             [self removeBall];
             if (self.ballAmount == 0) {
+                self.soundFile = [[NSBundle mainBundle] URLForResource:@"pongulatorend"
+                                                         withExtension:@"mp3"];
+                self.endSound = [[AVAudioPlayer alloc] initWithContentsOfURL:self.soundFile
+                                                                       error:nil];
+                self.endSound.volume = .5;
+                self.endSound.numberOfLoops = 0;
+                [self.endSound play];
                 [self.backgroundMusic stop];
                 self.backgroundMusic.currentTime = 0;
                 [self retryMenu];
@@ -500,6 +562,13 @@
         if (item == self.extraBallView) {
             [self removeExtraBall];
             if (self.ballAmount == 0) {
+                self.soundFile = [[NSBundle mainBundle] URLForResource:@"pongulatorend"
+                                                         withExtension:@"mp3"];
+                self.endSound = [[AVAudioPlayer alloc] initWithContentsOfURL:self.soundFile
+                                                                       error:nil];
+                self.endSound.volume = .5;
+                self.endSound.numberOfLoops = 0;
+                [self.endSound play];
                 [self.backgroundMusic stop];
                 self.backgroundMusic.currentTime = 0;
                 [self retryMenu];
@@ -508,6 +577,13 @@
         if (item == self.thirdBallView) {
             [self removeThirdBall];
             if (self.ballAmount == 0) {
+                self.soundFile = [[NSBundle mainBundle] URLForResource:@"pongulatorend"
+                                                         withExtension:@"mp3"];
+                self.endSound = [[AVAudioPlayer alloc] initWithContentsOfURL:self.soundFile
+                                                                       error:nil];
+                self.endSound.volume = .5;
+                self.endSound.numberOfLoops = 0;
+                [self.endSound play];
                 [self.backgroundMusic stop];
                 self.backgroundMusic.currentTime = 0;
                 [self retryMenu];
@@ -515,6 +591,7 @@
         }
     }
 }
+
 
 - (void) ballHitPaddle {
     [self bgChange];
