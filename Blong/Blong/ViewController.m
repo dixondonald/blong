@@ -8,8 +8,16 @@
 
 #import "ViewController.h"
 #import <AVFoundation/AVFoundation.h>
+#import <GameKit/GameKit.h>
 
-@interface ViewController () <UICollisionBehaviorDelegate> 
+@interface ViewController () <UICollisionBehaviorDelegate, GKGameCenterControllerDelegate>
+
+-(void)authenticateLocalPlayer;
+-(void)reportScore;
+-(void)showLeaderboardAndAchievements:(BOOL)shouldShowLeaderboard;
+
+@property(nonatomic, strong) NSString *leaderboardIdentifier;
+@property(nonatomic, assign) BOOL gameCenterEnabled;
 
 @property (nonatomic, strong) UIDynamicAnimator *animator;
 @property (nonatomic, strong) UIView *ballView;
@@ -59,6 +67,7 @@
 @property (nonatomic, strong) UIButton *hardButton;
 @property (nonatomic, strong) UIButton *harderButton;
 @property (nonatomic, strong) UIButton *hardestButton;
+@property (nonatomic, strong) UIButton *gcButton;
 
 
 @property BOOL isBall;
@@ -78,6 +87,9 @@
 
 - (void)viewDidLoad {
     [super viewDidLoad];
+
+    [self authenticateLocalPlayer];
+
     self.animator = [[UIDynamicAnimator new] initWithReferenceView:self.view];
     
     self.angles = [[NSArray alloc] initWithObjects:@1.0f, @2.5f, @4.0f, @5.35f, @7.0f, @8.5f, @10.15f, @11.75f, nil];
@@ -86,7 +98,6 @@
     self.bgView.frame = CGRectMake(0, 0, self.view.frame.size.width, self.view.frame.size.height);
     [self.view addSubview:self.bgView];
     self.anim = [UIImage animatedImageNamed:@"pongbg-" duration:1.0f];
-    [self bgChange];
     
     [self createMenu];
 
@@ -117,6 +128,10 @@
     
 }
 
+-(void)viewWillAppear:(BOOL)animated {
+    [self bgChange];
+}
+
 - (void)startGame {
     [self.backgroundMusic stop];
     self.ballAmount = 0;
@@ -125,7 +140,12 @@
     [self startTimer];
 }
 
+- (void)gcOpen:(UIButton*)sender {
+    [self showLeaderboardAndAchievements:YES];
+}
+
 - (void)easyStart:(UIButton*)sender {
+    self.leaderboardIdentifier = @"easy_leaderboard";
     self.ballSpeed = .10;
     self.musicFile = [[NSBundle mainBundle] URLForResource:@"pongulator110"
                                              withExtension:@"mp3"];
@@ -133,10 +153,12 @@
                                                                   error:nil];
     self.backgroundMusic.volume = .3;
     self.backgroundMusic.numberOfLoops = -1;
+    
     [self startGame];
 }
 
 - (void)mediumStart:(UIButton*)sender {
+    self.leaderboardIdentifier = @"medium_leaderboard";
     self.ballSpeed = .12;
     self.musicFile = [[NSBundle mainBundle] URLForResource:@"pongulator120"
                                              withExtension:@"mp3"];
@@ -144,10 +166,12 @@
                                                                   error:nil];
     self.backgroundMusic.volume = .3;
     self.backgroundMusic.numberOfLoops = -1;
+    
     [self startGame];
 }
 
 - (void)hardStart:(UIButton*)sender {
+    self.leaderboardIdentifier = @"hard_leaderboard";
     self.ballSpeed = .14;
     self.musicFile = [[NSBundle mainBundle] URLForResource:@"pongulator130"
                                              withExtension:@"mp3"];
@@ -159,6 +183,7 @@
 }
 
 - (void)harderStart:(UIButton*)sender {
+    self.leaderboardIdentifier = @"harder_leaderboard";
     self.ballSpeed = .16;
     self.musicFile = [[NSBundle mainBundle] URLForResource:@"pongulator140"
                                              withExtension:@"mp3"];
@@ -170,6 +195,7 @@
 }
 
 - (void)hardestStart:(UIButton*)sender {
+    self.leaderboardIdentifier = @"hardest_leaderboard";
     self.ballSpeed = .18;
     self.musicFile = [[NSBundle mainBundle] URLForResource:@"pongulator150"
                                              withExtension:@"mp3"];
@@ -181,7 +207,6 @@
 }
 
 - (void)gameRetry:(UIButton*)sender {
-//    [self.backgroundMusic stop];
     [self.retryButton removeFromSuperview];
     [self.menuButton removeFromSuperview];
     [self startTimer];
@@ -267,6 +292,18 @@
         
     });
     
+    CGRect gcRect = CGRectMake(self.view.frame.size.width -122, self.view.frame.size.height - 28, 120, 25);
+    self.gcButton = [[UIButton alloc] initWithFrame:gcRect];
+    [self.gcButton addTarget:self
+                        action:@selector(gcOpen:)
+              forControlEvents:UIControlEventTouchUpInside];
+    //    [self.gcButton setBackgroundColor:[UIColor colorWithWhite:1 alpha:.5]];
+    //    [self.gcButton setTitleColor:[UIColor blackColor] forState:UIControlStateNormal];
+    [self.gcButton.titleLabel setTextAlignment:NSTextAlignmentLeft];
+    [self.gcButton setTitle:@"gamecenter" forState:UIControlStateNormal];
+    self.gcButton.titleLabel.font = [UIFont fontWithName:@"HelveticaNeue-UltraLight" size:25];
+    [self.view addSubview:self.gcButton];
+    
     CGRect titleRect = CGRectMake(self.view.frame.size.width / 2 - 250, 10, 500, 75);
     self.titleLabel = [[UILabel alloc] initWithFrame:titleRect];
     self.titleLabel.textColor = [UIColor colorWithRed:(255/255.0) green:(255/255.0) blue:(255/255.0) alpha:.90];
@@ -339,6 +376,7 @@
 }
 
 -(void)removeMenu {
+    [self.gcButton removeFromSuperview];
     [self.titleLabel removeFromSuperview];
     [self.easyButton removeFromSuperview];
     [self.mediumButton removeFromSuperview];
@@ -348,7 +386,7 @@
 }
 
 - (void)retryMenu {
-
+    
     CGRect retryRect = CGRectMake(self.view.frame.size.width / 2 - 125, self.view.frame.size.height / 2 - 60, 250, 80);
     self.retryButton = [[UIButton alloc] initWithFrame:retryRect];
     [self.retryButton addTarget:self
@@ -556,6 +594,9 @@
                 [self.endSound play];
                 [self.backgroundMusic stop];
                 self.backgroundMusic.currentTime = 0;
+                
+                [self reportScore];
+
                 [self retryMenu];
             }
         }
@@ -571,6 +612,9 @@
                 [self.endSound play];
                 [self.backgroundMusic stop];
                 self.backgroundMusic.currentTime = 0;
+                
+                [self reportScore];
+
                 [self retryMenu];
             }
         }
@@ -586,6 +630,9 @@
                 [self.endSound play];
                 [self.backgroundMusic stop];
                 self.backgroundMusic.currentTime = 0;
+                
+                [self reportScore];
+
                 [self retryMenu];
             }
         }
@@ -656,6 +703,65 @@
 - (void)bgChangeBack {
     self.bgView.image = [UIImage animatedImageNamed:@"pong-" duration:.75f];
     [self.bgTimer invalidate];
+}
+
+-(void)authenticateLocalPlayer{
+    GKLocalPlayer *localPlayer = [GKLocalPlayer localPlayer];
+    
+    localPlayer.authenticateHandler = ^(UIViewController *viewController, NSError *error){
+        if (viewController != nil) {
+            [self presentViewController:viewController animated:YES completion:nil];
+        }
+        else{
+            if ([GKLocalPlayer localPlayer].authenticated) {
+                _gameCenterEnabled = YES;
+                
+                // Get the default leaderboard identifier.
+                [[GKLocalPlayer localPlayer] loadDefaultLeaderboardIdentifierWithCompletionHandler:^(NSString *leaderboardIdentifier, NSError *error) {
+                    
+                    if (error != nil) {
+                        NSLog(@"%@", [error localizedDescription]);
+                    }
+                    else{
+                        _leaderboardIdentifier = leaderboardIdentifier;
+                    }
+                }];
+            }
+            
+            else{
+                _gameCenterEnabled = NO;
+            }
+        }
+    };
+}
+
+-(void)reportScore{
+        GKScore *score = [[GKScore alloc] initWithLeaderboardIdentifier:_leaderboardIdentifier];
+    score.value = _score;
+    
+    [GKScore reportScores:@[score] withCompletionHandler:^(NSError *error) {
+        if (error != nil) {
+            NSLog(@"%@", [error localizedDescription]);
+        }
+    }];
+}
+
+-(void)showLeaderboardAndAchievements:(BOOL)shouldShowLeaderboard{
+    GKGameCenterViewController *gcViewController = [[GKGameCenterViewController alloc] init];
+    
+    gcViewController.gameCenterDelegate = self;
+    
+    if (shouldShowLeaderboard) {
+        gcViewController.viewState = GKGameCenterViewControllerStateLeaderboards;
+        gcViewController.leaderboardIdentifier = _leaderboardIdentifier;
+    }
+    
+    [self presentViewController:gcViewController animated:YES completion:nil];
+}
+
+-(void)gameCenterViewControllerDidFinish:(GKGameCenterViewController *)gameCenterViewController
+{
+    [gameCenterViewController dismissViewControllerAnimated:YES completion:nil];
 }
 
 - (void)didReceiveMemoryWarning {
