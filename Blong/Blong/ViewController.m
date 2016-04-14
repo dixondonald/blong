@@ -9,6 +9,7 @@
 #import "ViewController.h"
 #import <AVFoundation/AVFoundation.h>
 #import <GameKit/GameKit.h>
+@import GoogleMobileAds;
 
 @interface ViewController () <UICollisionBehaviorDelegate, GKGameCenterControllerDelegate>
 
@@ -18,6 +19,8 @@
 
 @property(nonatomic, strong) NSString *leaderboardIdentifier;
 @property(nonatomic, assign) BOOL gameCenterEnabled;
+
+@property(nonatomic, strong) GADInterstitial *interstitial;
 
 @property (nonatomic, strong) UIDynamicAnimator *animator;
 @property (nonatomic, strong) UIView *ballView;
@@ -74,6 +77,8 @@
 @property BOOL isExtraBall;
 @property BOOL isThirdBall;
 
+@property NSInteger gameCount;
+
 @property NSInteger ballAmount;
 @property NSInteger count;
 @property NSInteger score;
@@ -89,6 +94,9 @@
     [super viewDidLoad];
 
     [self authenticateLocalPlayer];
+    
+    self.interstitial = [self createAndLoadInterstitial];
+    
 
     self.animator = [[UIDynamicAnimator new] initWithReferenceView:self.view];
     
@@ -130,6 +138,25 @@
 
 -(void)viewWillAppear:(BOOL)animated {
     [self bgChange];
+}
+
+- (GADInterstitial *)createAndLoadInterstitial {
+    GADInterstitial *interstitial =
+    [[GADInterstitial alloc] initWithAdUnitID:@"ca-app-pub-3940256099942544/4411468910"];
+    interstitial.delegate = self;
+    [interstitial loadRequest:[GADRequest request]];
+    return interstitial;
+}
+
+- (void)interstitialDidDismissScreen:(GADInterstitial *)interstitial {
+    self.interstitial = [self createAndLoadInterstitial];
+    self.gameCount = 0;
+}
+
+- (void)displayAd {
+    if ([self.interstitial isReady]) {
+        [self.interstitial presentFromRootViewController:self];
+    }
 }
 
 - (void)startGame {
@@ -290,6 +317,66 @@
     self.backgroundMusic.numberOfLoops = -1;
     [self.backgroundMusic play];
         
+        CGRect easyRect = CGRectMake(self.view.frame.size.width / 2 - 90, self.view.frame.size.height / 2 - 80, 180, 40);
+        self.easyButton = [[UIButton alloc] initWithFrame:easyRect];
+        [self.easyButton addTarget:self
+                            action:@selector(easyStart:)
+                  forControlEvents:UIControlEventTouchUpInside];
+        //    [self.easyButton setBackgroundColor:[UIColor colorWithWhite:1 alpha:.5]];
+        //    [self.easyButton setTitleColor:[UIColor blackColor] forState:UIControlStateNormal];
+        [self.easyButton.titleLabel setTextAlignment:NSTextAlignmentCenter];
+        [self.easyButton setTitle:@"EASY" forState:UIControlStateNormal];
+        self.easyButton.titleLabel.font = [UIFont fontWithName:@"HelveticaNeue-UltraLight" size:40];
+        [self.view addSubview:self.easyButton];
+        
+        CGRect mediumRect = CGRectMake(self.view.frame.size.width / 2 - 90, self.view.frame.size.height / 2 - 30, 180, 40);
+        self.mediumButton = [[UIButton alloc] initWithFrame:mediumRect];
+        [self.mediumButton addTarget:self
+                              action:@selector(mediumStart:)
+                    forControlEvents:UIControlEventTouchUpInside];
+        //    [self.mediumButton setBackgroundColor:[UIColor whiteColor]];
+        //    [self.mediumButton setTitleColor:[UIColor blackColor] forState:UIControlStateNormal];
+        [self.mediumButton.titleLabel setTextAlignment:NSTextAlignmentCenter];
+        [self.mediumButton setTitle:@"MEDIUM" forState:UIControlStateNormal];
+        self.mediumButton.titleLabel.font = [UIFont fontWithName:@"HelveticaNeue-UltraLight" size:40];
+        [self.view addSubview:self.mediumButton];
+        
+        CGRect hardRect = CGRectMake(self.view.frame.size.width / 2 - 90, self.view.frame.size.height / 2 + 20, 180, 40);
+        self.hardButton = [[UIButton alloc] initWithFrame:hardRect];
+        [self.hardButton addTarget:self
+                            action:@selector(hardStart:)
+                  forControlEvents:UIControlEventTouchUpInside];
+        //    [self.hardButton setBackgroundColor:[UIColor whiteColor]];
+        //    [self.hardButton setTitleColor:[UIColor blackColor] forState:UIControlStateNormal];
+        [self.hardButton.titleLabel setTextAlignment:NSTextAlignmentCenter];
+        [self.hardButton setTitle:@"HARD" forState:UIControlStateNormal];
+        self.hardButton.titleLabel.font = [UIFont fontWithName:@"HelveticaNeue-UltraLight" size:40];
+        [self.view addSubview:self.hardButton];
+        
+        CGRect harderRect = CGRectMake(self.view.frame.size.width / 2 - 90, self.view.frame.size.height / 2 + 70, 180, 40);
+        self.harderButton = [[UIButton alloc] initWithFrame:harderRect];
+        [self.harderButton addTarget:self
+                              action:@selector(harderStart:)
+                    forControlEvents:UIControlEventTouchUpInside];
+        //    [self.harderButton setBackgroundColor:[UIColor whiteColor]];
+        //    [self.harderButton setTitleColor:[UIColor redColor] forState:UIControlStateNormal];
+        [self.harderButton.titleLabel setTextAlignment:NSTextAlignmentCenter];
+        [self.harderButton setTitle:@"HARDER" forState:UIControlStateNormal];
+        self.harderButton.titleLabel.font = [UIFont fontWithName:@"HelveticaNeue-UltraLight" size:40];
+        [self.view addSubview:self.harderButton];
+        
+        CGRect hardestRect = CGRectMake(self.view.frame.size.width / 2 - 100, self.view.frame.size.height / 2 + 120, 200, 40);
+        self.hardestButton = [[UIButton alloc] initWithFrame:hardestRect];
+        [self.hardestButton addTarget:self
+                               action:@selector(hardestStart:)
+                     forControlEvents:UIControlEventTouchUpInside];
+        //    [self.hardestButton setBackgroundColor:[UIColor whiteColor]];
+        //    [self.hardestButton setTitleColor:[UIColor blackColor] forState:UIControlStateNormal];
+        [self.hardestButton.titleLabel setTextAlignment:NSTextAlignmentCenter];
+        [self.hardestButton setTitle:@"HARDEST" forState:UIControlStateNormal];
+        self.hardestButton.titleLabel.font = [UIFont fontWithName:@"HelveticaNeue-UltraLight" size:40];
+        [self.view addSubview:self.hardestButton];
+        
     });
     
     CGRect gcRect = CGRectMake(self.view.frame.size.width -122, self.view.frame.size.height - 28, 120, 25);
@@ -314,65 +401,7 @@
     [self.view addSubview:self.titleLabel];
 
     
-    CGRect easyRect = CGRectMake(self.view.frame.size.width / 2 - 90, self.view.frame.size.height / 2 - 80, 180, 40);
-    self.easyButton = [[UIButton alloc] initWithFrame:easyRect];
-    [self.easyButton addTarget:self
-                        action:@selector(easyStart:)
-              forControlEvents:UIControlEventTouchUpInside];
-//    [self.easyButton setBackgroundColor:[UIColor colorWithWhite:1 alpha:.5]];
-//    [self.easyButton setTitleColor:[UIColor blackColor] forState:UIControlStateNormal];
-    [self.easyButton.titleLabel setTextAlignment:NSTextAlignmentCenter];
-    [self.easyButton setTitle:@"EASY" forState:UIControlStateNormal];
-    self.easyButton.titleLabel.font = [UIFont fontWithName:@"HelveticaNeue-UltraLight" size:40];
-    [self.view addSubview:self.easyButton];
     
-    CGRect mediumRect = CGRectMake(self.view.frame.size.width / 2 - 90, self.view.frame.size.height / 2 - 30, 180, 40);
-    self.mediumButton = [[UIButton alloc] initWithFrame:mediumRect];
-    [self.mediumButton addTarget:self
-                          action:@selector(mediumStart:)
-                forControlEvents:UIControlEventTouchUpInside];
-//    [self.mediumButton setBackgroundColor:[UIColor whiteColor]];
-//    [self.mediumButton setTitleColor:[UIColor blackColor] forState:UIControlStateNormal];
-    [self.mediumButton.titleLabel setTextAlignment:NSTextAlignmentCenter];
-    [self.mediumButton setTitle:@"MEDIUM" forState:UIControlStateNormal];
-    self.mediumButton.titleLabel.font = [UIFont fontWithName:@"HelveticaNeue-UltraLight" size:40];
-    [self.view addSubview:self.mediumButton];
-    
-    CGRect hardRect = CGRectMake(self.view.frame.size.width / 2 - 90, self.view.frame.size.height / 2 + 20, 180, 40);
-    self.hardButton = [[UIButton alloc] initWithFrame:hardRect];
-    [self.hardButton addTarget:self
-                        action:@selector(hardStart:)
-              forControlEvents:UIControlEventTouchUpInside];
-//    [self.hardButton setBackgroundColor:[UIColor whiteColor]];
-//    [self.hardButton setTitleColor:[UIColor blackColor] forState:UIControlStateNormal];
-    [self.hardButton.titleLabel setTextAlignment:NSTextAlignmentCenter];
-    [self.hardButton setTitle:@"HARD" forState:UIControlStateNormal];
-    self.hardButton.titleLabel.font = [UIFont fontWithName:@"HelveticaNeue-UltraLight" size:40];
-    [self.view addSubview:self.hardButton];
-    
-    CGRect harderRect = CGRectMake(self.view.frame.size.width / 2 - 90, self.view.frame.size.height / 2 + 70, 180, 40);
-    self.harderButton = [[UIButton alloc] initWithFrame:harderRect];
-    [self.harderButton addTarget:self
-                          action:@selector(harderStart:)
-                forControlEvents:UIControlEventTouchUpInside];
-//    [self.harderButton setBackgroundColor:[UIColor whiteColor]];
-//    [self.harderButton setTitleColor:[UIColor redColor] forState:UIControlStateNormal];
-    [self.harderButton.titleLabel setTextAlignment:NSTextAlignmentCenter];
-    [self.harderButton setTitle:@"HARDER" forState:UIControlStateNormal];
-    self.harderButton.titleLabel.font = [UIFont fontWithName:@"HelveticaNeue-UltraLight" size:40];
-    [self.view addSubview:self.harderButton];
-    
-    CGRect hardestRect = CGRectMake(self.view.frame.size.width / 2 - 100, self.view.frame.size.height / 2 + 120, 200, 40);
-    self.hardestButton = [[UIButton alloc] initWithFrame:hardestRect];
-    [self.hardestButton addTarget:self
-                           action:@selector(hardestStart:)
-                 forControlEvents:UIControlEventTouchUpInside];
-//    [self.hardestButton setBackgroundColor:[UIColor whiteColor]];
-//    [self.hardestButton setTitleColor:[UIColor blackColor] forState:UIControlStateNormal];
-    [self.hardestButton.titleLabel setTextAlignment:NSTextAlignmentCenter];
-    [self.hardestButton setTitle:@"HARDEST" forState:UIControlStateNormal];
-    self.hardestButton.titleLabel.font = [UIFont fontWithName:@"HelveticaNeue-UltraLight" size:40];
-    [self.view addSubview:self.hardestButton];
 }
 
 -(void)removeMenu {
@@ -596,6 +625,11 @@
                 self.backgroundMusic.currentTime = 0;
                 
                 [self reportScore];
+                
+                self.gameCount++;
+                if (self.gameCount == 3) {
+                    [self displayAd];
+                }
 
                 [self retryMenu];
             }
@@ -614,7 +648,12 @@
                 self.backgroundMusic.currentTime = 0;
                 
                 [self reportScore];
-
+                
+                self.gameCount++;
+                if (self.gameCount == 3) {
+                    [self displayAd];
+                }
+                
                 [self retryMenu];
             }
         }
@@ -632,7 +671,12 @@
                 self.backgroundMusic.currentTime = 0;
                 
                 [self reportScore];
-
+                
+                self.gameCount++;
+                if (self.gameCount == 3) {
+                    [self displayAd];
+                }
+                
                 [self retryMenu];
             }
         }
