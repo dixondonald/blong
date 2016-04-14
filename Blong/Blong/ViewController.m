@@ -11,7 +11,7 @@
 #import <GameKit/GameKit.h>
 @import GoogleMobileAds;
 
-@interface ViewController () <UICollisionBehaviorDelegate, GKGameCenterControllerDelegate>
+@interface ViewController () <UICollisionBehaviorDelegate, GKGameCenterControllerDelegate, GADInterstitialDelegate>
 
 -(void)authenticateLocalPlayer;
 -(void)reportScore;
@@ -71,6 +71,7 @@
 @property (nonatomic, strong) UIButton *harderButton;
 @property (nonatomic, strong) UIButton *hardestButton;
 @property (nonatomic, strong) UIButton *gcButton;
+@property (nonatomic, strong) UIButton *IAPButton;
 
 
 @property BOOL isBall;
@@ -97,6 +98,8 @@
     
     self.interstitial = [self createAndLoadInterstitial];
     
+    NSUserDefaults *defaults = [NSUserDefaults standardUserDefaults];
+    self.gameCount = [defaults integerForKey:@"HighScore"];
 
     self.animator = [[UIDynamicAnimator new] initWithReferenceView:self.view];
     
@@ -141,11 +144,11 @@
 }
 
 - (GADInterstitial *)createAndLoadInterstitial {
-    GADInterstitial *interstitial =
+    self.interstitial =
     [[GADInterstitial alloc] initWithAdUnitID:@"ca-app-pub-3940256099942544/4411468910"];
-    interstitial.delegate = self;
-    [interstitial loadRequest:[GADRequest request]];
-    return interstitial;
+    self.interstitial.delegate = self;
+    [self.interstitial loadRequest:[GADRequest request]];
+    return self.interstitial;
 }
 
 - (void)interstitialDidDismissScreen:(GADInterstitial *)interstitial {
@@ -391,6 +394,19 @@
     self.gcButton.titleLabel.font = [UIFont fontWithName:@"HelveticaNeue-UltraLight" size:25];
     [self.view addSubview:self.gcButton];
     
+    CGRect IAPRect = CGRectMake(2, self.view.frame.size.height - 28, 120, 25);
+    self.IAPButton = [[UIButton alloc] initWithFrame:IAPRect];
+    [self.IAPButton addTarget:self
+                      action:@selector(gcOpen:)
+            forControlEvents:UIControlEventTouchUpInside];
+    //    [self.IAPButton setBackgroundColor:[UIColor colorWithWhite:1 alpha:.5]];
+    //    [self.IAPButton setTitleColor:[UIColor blackColor] forState:UIControlStateNormal];
+    [self.IAPButton.titleLabel setTextAlignment:NSTextAlignmentLeft];
+    [self.IAPButton setTitle:@"remove ads" forState:UIControlStateNormal];
+    self.IAPButton.titleLabel.font = [UIFont fontWithName:@"HelveticaNeue-UltraLight" size:25];
+    [self.view addSubview:self.IAPButton];
+
+    
     CGRect titleRect = CGRectMake(self.view.frame.size.width / 2 - 250, 10, 500, 75);
     self.titleLabel = [[UILabel alloc] initWithFrame:titleRect];
     self.titleLabel.textColor = [UIColor colorWithRed:(255/255.0) green:(255/255.0) blue:(255/255.0) alpha:.90];
@@ -405,6 +421,8 @@
 }
 
 -(void)removeMenu {
+    
+    [self.IAPButton removeFromSuperview];
     [self.gcButton removeFromSuperview];
     [self.titleLabel removeFromSuperview];
     [self.easyButton removeFromSuperview];
@@ -627,7 +645,12 @@
                 [self reportScore];
                 
                 self.gameCount++;
-                if (self.gameCount == 3) {
+                
+                NSUserDefaults *defaults = [NSUserDefaults standardUserDefaults];
+                [defaults setInteger:self.gameCount forKey:@"HighScore"];
+                [defaults synchronize];
+                
+                if (self.gameCount == 5) {
                     [self displayAd];
                 }
 
@@ -650,7 +673,12 @@
                 [self reportScore];
                 
                 self.gameCount++;
-                if (self.gameCount == 3) {
+                
+                NSUserDefaults *defaults = [NSUserDefaults standardUserDefaults];
+                [defaults setInteger:self.gameCount forKey:@"HighScore"];
+                [defaults synchronize];
+                
+                if (self.gameCount == 5) {
                     [self displayAd];
                 }
                 
@@ -673,7 +701,12 @@
                 [self reportScore];
                 
                 self.gameCount++;
-                if (self.gameCount == 3) {
+                
+                NSUserDefaults *defaults = [NSUserDefaults standardUserDefaults];
+                [defaults setInteger:self.gameCount forKey:@"HighScore"];
+                [defaults synchronize];
+                
+                if (self.gameCount == 5) {
                     [self displayAd];
                 }
                 
