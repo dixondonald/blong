@@ -106,7 +106,7 @@
 
     self.areAdsRemoved = [[NSUserDefaults standardUserDefaults] boolForKey:@"areAdsRemoved"];
     [[NSUserDefaults standardUserDefaults] synchronize];
-    
+        
     self.animator = [[UIDynamicAnimator new] initWithReferenceView:self.view];
     
     self.angles = [[NSArray alloc] initWithObjects:@1.0f, @2.5f, @4.0f, @5.35f, @7.0f, @8.5f, @10.15f, @11.75f, nil];
@@ -151,7 +151,7 @@
 
 - (GADInterstitial *)createAndLoadInterstitial {
     self.interstitial =
-    [[GADInterstitial alloc] initWithAdUnitID:@"ca-app-pub-3940256099942544/4411468910"];
+    [[GADInterstitial alloc] initWithAdUnitID:@"ca-app-pub-8937140377655133/3611418408"];
     self.interstitial.delegate = self;
     [self.interstitial loadRequest:[GADRequest request]];
     return self.interstitial;
@@ -203,7 +203,7 @@
     }
     else if(!validProduct){
         NSLog(@"No products available");
-        //this is called if your product id is not valid, this shouldn't be called unless that happens.
+
     }
 }
 
@@ -215,7 +215,7 @@
 }
 
 - (void)restorePurchase:(UIButton*)sender {
-    //this is called when the user restores purchases, you should hook this up to a button
+
     [[SKPaymentQueue defaultQueue] addTransactionObserver:self];
     [[SKPaymentQueue defaultQueue] restoreCompletedTransactions];
 }
@@ -226,17 +226,9 @@
     NSLog(@"received restored transactions: %lu", (unsigned long)queue.transactions.count);
     for(SKPaymentTransaction *transaction in queue.transactions){
         if(transaction.transactionState == SKPaymentTransactionStateRestored){
-            //called when the user successfully restores a purchase
+
             NSLog(@"Transaction state -> Restored");
             
-            //if you have more than one in-app purchase product,
-            //you restore the correct product for the identifier.
-            //For example, you could use
-            //if(productID == kRemoveAdsProductIdentifier)
-            //to get the product identifier for the
-            //restored purchases, you can use
-            //
-            //NSString *productID = transaction.payment.productIdentifier;
             [self doRemoveAds];
             [[SKPaymentQueue defaultQueue] finishTransaction:transaction];
             break;
@@ -248,11 +240,12 @@
     for(SKPaymentTransaction *transaction in transactions){
         switch(transaction.transactionState){
             case SKPaymentTransactionStatePurchasing: NSLog(@"Transaction state -> Purchasing");
-                //called when the user is in the process of purchasing, do not add any of your own code here.
+
                 break;
             case SKPaymentTransactionStatePurchased:
-                //this is called when the user has successfully purchased the package (Cha-Ching!)
-                [self doRemoveAds]; //you can add your code for what you want to happen when the user buys the purchase here, for this tutorial we use removing ads
+
+                [self doRemoveAds];
+                
                 [[SKPaymentQueue defaultQueue] finishTransaction:transaction];
                 NSLog(@"Transaction state -> Purchased");
                 break;
@@ -280,12 +273,6 @@
     self.restoreButton.hidden = YES;
     self.restoreButton.enabled = NO;
     [[NSUserDefaults standardUserDefaults] setBool:self.areAdsRemoved forKey:@"areAdsRemoved"];
-    //use NSUserDefaults so that you can load whether or not they bought it
-    //it would be better to use KeyChain access, or something more secure
-    //to store the user data, because NSUserDefaults can be changed.
-    //You're average downloader won't be able to change it very easily, but
-    //it's still best to use something more secure than NSUserDefaults.
-    //For the purpose of this tutorial, though, we're going to use NSUserDefaults
     [[NSUserDefaults standardUserDefaults] synchronize];
 }
 
@@ -409,12 +396,24 @@
 - (void) leftPanFired:(UIPanGestureRecognizer *)recognizer {
         CGPoint newPaddleCenter = [recognizer locationInView:self.view];
     self.leftPaddleView.center = CGPointMake(self.leftPaddleView.center.x, newPaddleCenter.y);
-        [self.animator updateItemUsingCurrentState:self.leftPaddleView];
+    if (newPaddleCenter.y <= 0) {
+        self.leftPaddleView.center = CGPointMake(self.leftPaddleView.center.x, 30);
+    }
+    if (newPaddleCenter.y >= self.view.frame.size.height) {
+        self.leftPaddleView.center = CGPointMake(self.leftPaddleView.center.x, self.view.frame.size.height - 30);
+    }
+    [self.animator updateItemUsingCurrentState:self.leftPaddleView];
 }
 
 - (void) rightPanFired:(UIPanGestureRecognizer *)recognizer {
     CGPoint newPaddleCenter = [recognizer locationInView:self.view];
     self.rightPaddleView.center = CGPointMake(self.rightPaddleView.center.x, newPaddleCenter.y);
+    if (newPaddleCenter.y <= 0) {
+        self.rightPaddleView.center = CGPointMake(self.rightPaddleView.center.x, 30);
+    }
+    if (newPaddleCenter.y >= self.view.frame.size.height) {
+        self.rightPaddleView.center = CGPointMake(self.rightPaddleView.center.x, self.view.frame.size.height - 30);
+    }
     [self.animator updateItemUsingCurrentState:self.rightPaddleView];
 }
 
@@ -788,9 +787,9 @@
                 self.backgroundMusic.currentTime = 0;
                 
                 [self reportScore];
-                
+
                 self.gameCount++;
-                
+
                 NSUserDefaults *defaults = [NSUserDefaults standardUserDefaults];
                 [defaults setInteger:self.gameCount forKey:@"HighScore"];
                 [defaults synchronize];
@@ -819,7 +818,7 @@
                 self.backgroundMusic.currentTime = 0;
                 
                 [self reportScore];
-                
+
                 self.gameCount++;
                 
                 NSUserDefaults *defaults = [NSUserDefaults standardUserDefaults];
@@ -852,7 +851,7 @@
                 [self reportScore];
                 
                 self.gameCount++;
-                
+
                 NSUserDefaults *defaults = [NSUserDefaults standardUserDefaults];
                 [defaults setInteger:self.gameCount forKey:@"HighScore"];
                 [defaults synchronize];
