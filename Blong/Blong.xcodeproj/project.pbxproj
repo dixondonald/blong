@@ -565,6 +565,7 @@
 				PRODUCT_BUNDLE_IDENTIFIER = com.DonaldDixon.Pongulator;
 				PRODUCT_NAME = PONGULATOR;
 				PROVISIONING_PROFILE = "";
+				TARGETED_DEVICE_FAMILY = 1;
 			};
 			name = Debug;
 		};
@@ -580,6 +581,7 @@
 				PRODUCT_BUNDLE_IDENTIFIER = com.DonaldDixon.Pongulator;
 				PRODUCT_NAME = PONGULATOR;
 				PROVISIONING_PROFILE = "";
+				TARGETED_DEVICE_FAMILY = 1;
 			};
 			name = Release;
 		};
