@@ -52,7 +52,7 @@
 
 /* Begin PBXFileReference section */
 		312B2846A61483B3CEA48145 /* libPods.a */ = {isa = PBXFileReference; explicitFileType = archive.ar; includeInIndex = 0; path = libPods.a; sourceTree = BUILT_PRODUCTS_DIR; };
-		824B84C21C9727290009C182 /* Blong.app */ = {isa = PBXFileReference; explicitFileType = wrapper.application; includeInIndex = 0; path = Blong.app; sourceTree = BUILT_PRODUCTS_DIR; };
+		824B84C21C9727290009C182 /* PONGULATOR.app */ = {isa = PBXFileReference; explicitFileType = wrapper.application; includeInIndex = 0; path = PONGULATOR.app; sourceTree = BUILT_PRODUCTS_DIR; };
 		824B84C61C9727290009C182 /* main.m */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.c.objc; path = main.m; sourceTree = "<group>"; };
 		824B84C81C9727290009C182 /* AppDelegate.h */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.c.h; path = AppDelegate.h; sourceTree = "<group>"; };
 		824B84C91C9727290009C182 /* AppDelegate.m */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.c.objc; path = AppDelegate.m; sourceTree = "<group>"; };
@@ -142,7 +142,7 @@
 		824B84C31C9727290009C182 /* Products */ = {
 			isa = PBXGroup;
 			children = (
-				824B84C21C9727290009C182 /* Blong.app */,
+				824B84C21C9727290009C182 /* PONGULATOR.app */,
 				824B84DB1C97272A0009C182 /* BlongTests.xctest */,
 				824B84E61C97272A0009C182 /* BlongUITests.xctest */,
 			);
@@ -232,7 +232,7 @@
 			);
 			name = Blong;
 			productName = Blong;
-			productReference = 824B84C21C9727290009C182 /* Blong.app */;
+			productReference = 824B84C21C9727290009C182 /* PONGULATOR.app */;
 			productType = "com.apple.product-type.application";
 		};
 		824B84DA1C97272A0009C182 /* BlongTests */ = {
@@ -563,7 +563,7 @@
 				INFOPLIST_FILE = Blong/Info.plist;
 				LD_RUNPATH_SEARCH_PATHS = "$(inherited) @executable_path/Frameworks";
 				PRODUCT_BUNDLE_IDENTIFIER = com.DonaldDixon.Pongulator;
-				PRODUCT_NAME = "$(TARGET_NAME)";
+				PRODUCT_NAME = PONGULATOR;
 				PROVISIONING_PROFILE = "";
 			};
 			name = Debug;
@@ -578,7 +578,7 @@
 				INFOPLIST_FILE = Blong/Info.plist;
 				LD_RUNPATH_SEARCH_PATHS = "$(inherited) @executable_path/Frameworks";
 				PRODUCT_BUNDLE_IDENTIFIER = com.DonaldDixon.Pongulator;
-				PRODUCT_NAME = "$(TARGET_NAME)";
+				PRODUCT_NAME = PONGULATOR;
 				PROVISIONING_PROFILE = "";
 			};
 			name = Release;

@@ -146,6 +146,7 @@
 }
 
 -(void)viewWillAppear:(BOOL)animated {
+    [super viewWillAppear:animated];
     [self bgChange];
 }
 
@@ -240,26 +241,33 @@
     for(SKPaymentTransaction *transaction in transactions){
         switch(transaction.transactionState){
             case SKPaymentTransactionStatePurchasing: NSLog(@"Transaction state -> Purchasing");
-
                 break;
+            
             case SKPaymentTransactionStatePurchased:
-
                 [self doRemoveAds];
                 
                 [[SKPaymentQueue defaultQueue] finishTransaction:transaction];
                 NSLog(@"Transaction state -> Purchased");
                 break;
+                
             case SKPaymentTransactionStateRestored:
                 NSLog(@"Transaction state -> Restored");
-                //add the same code as you did from SKPaymentTransactionStatePurchased here
+
                 [[SKPaymentQueue defaultQueue] finishTransaction:transaction];
                 break;
+            
+            case SKPaymentTransactionStateDeferred:
+                [[SKPaymentQueue defaultQueue] finishTransaction:transaction];
+                NSLog(@"Transaction state -> Deferred");
+
+                break;
+                
             case SKPaymentTransactionStateFailed:
-                //called when the transaction does not finish
+
                 if(transaction.error.code == SKErrorPaymentCancelled){
                     NSLog(@"Transaction state -> Cancelled");
-                    //the user cancelled the payment ;(
                 }
+                
                 [[SKPaymentQueue defaultQueue] finishTransaction:transaction];
                 break;
         }
